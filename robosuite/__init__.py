@@ -8,6 +8,7 @@ from robosuite.environments.sawyer_nut_assembly import SawyerNutAssembly
 
 from robosuite.environments.baxter_lift import BaxterLift
 from robosuite.environments.baxter_peg_in_hole import BaxterPegInHole
+from robosuite.environments.baxter_door import BaxterDoor
 
 __version__ = "0.1.0"
 __logo__ = """

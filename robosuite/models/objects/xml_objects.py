@@ -120,3 +120,20 @@ class PlateWithHoleObject(MujocoXMLObject):
 
     def __init__(self):
         super().__init__(xml_path_completion("objects/plate-with-hole.xml"))
+
+class DoorWithHandleObject(MujocoXMLObject):
+  """
+  Door with handle
+  """
+
+  def __init__(self):
+        super().__init__(xml_path_completion("objects/door_dapg.xml"))  
+
+class TestObject(MujocoXMLObject):
+  """
+  Door
+  """
+
+  def __init__(self):
+        super().__init__(xml_path_completion("objects/test_obj.xml"))
+

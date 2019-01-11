@@ -14,6 +14,8 @@ from .xml_objects import (
     CerealVisualObject,
     CanVisualObject,
     PlateWithHoleObject,
+    DoorWithHandleObject,
+    TestObject,
 )
 
 from .generated_objects import (
