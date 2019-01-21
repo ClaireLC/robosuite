@@ -1,76 +1,76 @@
 <!-- ======================================================
-	This file is part of MuJoCo.     
-	Copyright 2009-2016 Roboti LLC.
-	
-	Model 		:: PR2 from Willow Garage 
-		Source		: (Provided by Sergey Levine, UC Berkeley)
-		Downloaded	: 18July'14
-		
-	Mujoco		:: Advanced physics simulation engine
-		Source		: www.roboti.us
-		Version		: 1.31
-		Released 	: 23Apr16
-		
-	Author		:: Vikash Kumar
-		Contacts 	: kumar@roboti.us
-		Last edits 	: 30Apr'16, 14Dec'15, 10Oct'15
+  This file is part of MuJoCo.     
+  Copyright 2009-2016 Roboti LLC.
+  
+  Model     :: PR2 from Willow Garage 
+    Source    : (Provided by Sergey Levine, UC Berkeley)
+    Downloaded  : 18July'14
+    
+  Mujoco    :: Advanced physics simulation engine
+    Source    : www.roboti.us
+    Version   : 1.31
+    Released  : 23Apr16
+    
+  Author    :: Vikash Kumar
+    Contacts  : kumar@roboti.us
+    Last edits  : 30Apr'16, 14Dec'15, 10Oct'15
 ====================================================== -->
 
 <mujoco model="pr2(v1.31)">
-    <compiler 	meshdir="meshes/" 
-				coordinate="local" 
-				angle="radian"/>
+    <compiler   meshdir="meshes/" 
+        coordinate="local" 
+        angle="radian"/>
 
-	<option timestep="0.01" 
-			gravity="0 0 -9.81"/>
+  <option timestep="0.01" 
+      gravity="0 0 -9.81"/>
 
-	<asset>
-		<mesh file="base_L.stl"/>
-		<mesh file="caster_L.stl"/>
-		<mesh file="torso_lift_L.stl"/>
-		<mesh file="head_pan_L.stl"/>
-		<mesh file="head_tilt_L.stl"/>
-		<mesh file="tilting_hokuyo_L.stl"/>
-		<mesh file="shoulder_pan.stl"/>
-		<mesh file="shoulder_lift.stl"/>
-		<mesh file="upper_arm_roll_L.stl"/>
-		<mesh file="upper_arm.stl"/>
-		<mesh file="elbow_flex.stl"/>
-		<mesh file="forearm_roll_L.stl"/>
-		<mesh file="forearm.stl"/>
-		
-		
-		<mesh file="wrist_flex.stl"/>
-		<mesh file="wrist_roll_L.stl"/>
-		<mesh file="gripper_palm.stl"/>
-		<mesh file="l_finger.stl"/>
-		<mesh file="l_finger_tip.stl"/>
-				
-		<material name="MatGnd" specular=".3" shininess=".3" reflectance="0.3" rgba=".5 .55 .5 1"/>
-	</asset>
-	
-	
+  <asset>
+    <mesh file="meshes/base_L.stl"/>
+    <mesh file="meshes/caster_L.stl"/>
+    <mesh file="meshes/torso_lift_L.stl"/>
+    <mesh file="meshes/head_pan_L.stl"/>
+    <mesh file="meshes/head_tilt_L.stl"/>
+    <mesh file="meshes/tilting_hokuyo_L.stl"/>
+    <mesh file="meshes/shoulder_pan.stl"/>
+    <mesh file="meshes/shoulder_lift.stl"/>
+    <mesh file="meshes/upper_arm_roll_L.stl"/>
+    <mesh file="meshes/upper_arm.stl"/>
+    <mesh file="meshes/elbow_flex.stl"/>
+    <mesh file="meshes/forearm_roll_L.stl"/>
+    <mesh file="meshes/forearm.stl"/>
+    
+    
+    <mesh file="meshes/wrist_flex.stl"/>
+    <mesh file="meshes/wrist_roll_L.stl"/>
+    <mesh file="meshes/gripper_palm.stl"/>
+    <mesh file="meshes/l_finger.stl"/>
+    <mesh file="meshes/l_finger_tip.stl"/>
+        
+    <material name="MatGnd" specular=".3" shininess=".3" reflectance="0.3" rgba=".5 .55 .5 1"/>
+  </asset>
+  
+  
     <contact>       
         <pair geom1="r_gripper_l_finger_tip" geom2="r_gripper_r_finger_tip"/>
-		<pair geom1="l_gripper_l_finger_tip" geom2="l_gripper_r_finger_tip"/>
-		<pair geom1="base" geom2="r_forearm"/>
-		<pair geom1="base" geom2="l_forearm"/>
-		
+    <pair geom1="l_gripper_l_finger_tip" geom2="l_gripper_r_finger_tip"/>
+    <pair geom1="base" geom2="r_forearm"/>
+    <pair geom1="base" geom2="l_forearm"/>
+    
     </contact>
   
     <default>
         <!--<joint limited="false" damping=".01" armature=".005" frictional="false"/>-->
         <joint limited="false" damping=".01" armature=".005"/>
         <geom contype="1" conaffinity="0" friction="1 0.1 0.1" type="mesh"/>
-		<default class="gripper">
-			<joint damping="0.005" armature=".005"/>
-		</default>
+    <default class="gripper">
+      <joint damping="0.005" armature=".005"/>
+    </default>
     </default>
     
     <worldbody>
-	<light directional="true" cutoff="4" exponent="20" diffuse="1 1 1" specular="0 0 0" pos=".5 0.75 1.5" dir="-.5 -0.75 -1.5"/>
-	<geom name="gnd" material="MatGnd" type="plane" contype="0" conaffinity="1" pos="0 0 0" size="1.5 1.5 0.25"/>
-	
+  <light directional="true" cutoff="4" exponent="20" diffuse="1 1 1" specular="0 0 0" pos=".5 0.75 1.5" dir="-.5 -0.75 -1.5"/>
+  <geom name="gnd" material="MatGnd" type="plane" contype="0" conaffinity="1" pos="0 0 0" size="1.5 1.5 0.25"/>
+  
         <body name="base_footprint" pos="0 0 0">
             <joint name="rootx" type="slide"   pos="0 0 0" axis="1 0 0"/>
             <joint name="rooty" type="slide"   pos="0 0 0" axis="0 1 0"/>
@@ -456,4 +456,33 @@
             </body>
         </body>
     </worldbody>
+    
+    <actuator>
+      <velocity joint="rootx"  name="vel_rootx" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="rooty"  name="vel_rooty" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="rootwz" name="vel_rootwz" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="torso_lift_joint" name="vel_torso_lift_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_shoulder_pan_joint"     name="vel_r_shoulder_pan_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_shoulder_lift_joint"    name="vel_r_shoulder_lift_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_upper_arm_roll_joint"   name="vel_r_upper_arm_roll_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_elbow_flex_joint"       name="vel_r_elbow_flex_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_forearm_roll_joint"     name="vel_forearm_roll_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_wrist_flex_joint"       name="vel_r_wrist_flex_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_wrist_roll_joint"       name="vel_r_wrist_roll_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_gripper_l_finger_joint" name="vel_r_gripper_l_finger_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_gripper_l_finger_tip_joint" name="vel_r_gripper_l_finger_tip_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_gripper_r_finger_joint" name="vel_r_gripper_r_finger_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="r_gripper_r_finger_tip_joint" name="vel_r_gripper_r_finger_tip_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_shoulder_pan_joint" name="vel_l_shoulder_pan_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_shoulder_lift_joint" name="vel_l_shoulder_lift_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_upper_arm_roll_joint" name="vel_l_upper_arm_roll_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_elbow_flex_joint" name="vel_l_elbow_flex_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_forearm_roll_joint" name="vel_l_forearm_roll_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_wrist_flex_joint" name="vel_l_wrist_flex_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_wrist_roll_joint" name="vel_l_wrist_roll_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_gripper_l_finger_joint" name="vel_l_gripper_l_finger_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_gripper_l_finger_tip_joint" name="vel_l_gripper_l_finger_tip_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_gripper_r_finger_joint" name="vel_l_gripper_r_finger_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+      <velocity joint="l_gripper_r_finger_tip_joint" name="vel_l_gripper_r_finger_tip_joint" ctrlrange="-2 2" ctrllimited="true" kv="0.5"/>
+    </actuator>
 </mujoco>
