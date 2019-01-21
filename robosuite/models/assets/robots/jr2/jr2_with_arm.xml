@@ -1,21 +1,21 @@
 <mujoco model="segway_robot">
-    <compiler angle="radian" meshdir="./meshes/" />
+    <compiler angle="radian" coordinate="local"/>
     <size njmax="500" nconmax="100" />
     <asset>
-        <mesh name="fixed_chassis_collision_with_body" file="fixed_chassis_collision_with_body.stl" scale="0.8 0.8 1" />
-        <mesh name="fixed_body" file="fixed_body.stl" scale="0.8 0.8 1" />
-        <mesh name="frogleg_caster_pivot_collision" file="frogleg_caster_pivot_collision.stl" />
-        <mesh name="tilt_servo_collision" file="tilt_servo_collision.stl" />
-        <mesh name="touch_screen_collision_with_body" file="touch_screen_collision_with_body.stl" />
-        <mesh name="right_arm_mount_collision" file="right_arm_mount_collision.stl" />
-        <mesh name="base" file="base.stl" />
-        <mesh name="shoulder" file="shoulder.stl" />
-        <mesh name="arm_mico" file="arm_mico.stl" />
-        <mesh name="forearm_mico" file="forearm_mico.stl" />
-        <mesh name="wrist" file="wrist.stl" />
-        <mesh name="hand_2finger" file="hand_2finger.stl" />
-        <mesh name="finger_proximal" file="finger_proximal.stl" />
-        <mesh name="finger_distal" file="finger_distal.stl" />
+        <mesh name="fixed_chassis_collision_with_body" file="meshes/fixed_chassis_collision_with_body.stl" scale="0.8 0.8 1" />
+        <mesh name="fixed_body" file="meshes/fixed_body.stl" scale="0.8 0.8 1" />
+        <mesh name="frogleg_caster_pivot_collision" file="meshes/frogleg_caster_pivot_collision.stl" />
+        <mesh name="tilt_servo_collision" file="meshes/tilt_servo_collision.stl" />
+        <mesh name="touch_screen_collision_with_body" file="meshes/touch_screen_collision_with_body.stl" />
+        <mesh name="right_arm_mount_collision" file="meshes/right_arm_mount_collision.stl" />
+        <mesh name="base" file="meshes/base.stl" />
+        <mesh name="shoulder" file="meshes/shoulder.stl" />
+        <mesh name="arm_mico" file="meshes/arm_mico.stl" />
+        <mesh name="forearm_mico" file="meshes/forearm_mico.stl" />
+        <mesh name="wrist" file="meshes/wrist.stl" />
+        <mesh name="hand_2finger" file="meshes/hand_2finger.stl" />
+        <mesh name="finger_proximal" file="meshes/finger_proximal.stl" />
+        <mesh name="finger_distal" file="meshes/finger_distal.stl" />
     </asset>
     <worldbody>
         <body name="base_link" pos="0 0 0">
