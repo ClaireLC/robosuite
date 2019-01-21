@@ -17,7 +17,7 @@
 ====================================================== -->
 
 <mujoco model="pr2(v1.31)">
-    <compiler   meshdir="meshes/" 
+    <compiler
         coordinate="local" 
         angle="radian"/>
 
