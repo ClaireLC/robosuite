@@ -18,17 +18,13 @@ class JR2(Robot):
 
     @property
     def dof(self):
-        return 12
+        return 10
 
     @property
     def joints(self):
-        #print(self.worldbody.find("./body/joint").get("name"))
-        #return [self.worldbody.find("./body/joint").get("name")]
         return [
-                "left_wheel",
-                "right_wheel",
-                "pan_joint",
-                "tilt_joint",
+                "rootx",
+                "rootwz",
                 "m1n6s200_joint_1",
                 "m1n6s200_joint_2",
                 "m1n6s200_joint_3",
@@ -41,5 +37,7 @@ class JR2(Robot):
 
     @property
     def init_qpos(self):
-        #return np.array([0, -1.18, 0.00, 2.18, 0.00, 0.57, 3.3161])
-        return np.zeros(12)
+        pos = np.zeros(10)
+        pos[3] = np.pi - 0.1
+        pos[4] = np.pi - 0.1
+        return pos
