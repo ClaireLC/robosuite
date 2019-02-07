@@ -13,17 +13,18 @@ class JR2(Robot):
 
     def set_base_xpos(self, pos):
         """Places the robot on position @pos."""
-        node = self.worldbody.find("./body[@name='base_link']")
+        node = self.worldbody.find("./body[@name='base_footprint']")
         node.set("pos", array_to_string(pos - self.bottom_offset))
 
     @property
     def dof(self):
-        return 10
+        return 9
 
     @property
     def joints(self):
         return [
                 "rootx",
+                "rooty",
                 "rootwz",
                 "m1n6s200_joint_1",
                 "m1n6s200_joint_2",
@@ -31,13 +32,34 @@ class JR2(Robot):
                 "m1n6s200_joint_4",
                 "m1n6s200_joint_5",
                 "m1n6s200_joint_6",
-                "m1n6s200_joint_finger_1",
-                "m1n6s200_joint_finger_2",
+                #"m1n6s200_joint_finger_1",
+                #"m1n6s200_joint_finger_2",
                ]
 
     @property
     def init_qpos(self):
-        pos = np.zeros(10)
-        pos[3] = np.pi - 0.1
+        pos = np.zeros(9)
         pos[4] = np.pi - 0.1
+        pos[5] = np.pi - 0.1
         return pos
+    
+    @property
+    def visualization_sites(self):
+        reutrn ["r_grip_site",]
+  
+    @property
+    def contact_geoms(self):
+        return[
+          "body",
+          "neck",
+          "head",
+          "front_caster",
+          "rear_caster",
+          "armlink_base",
+          "armlink_2",  
+          "armlink_3",  
+          "armlink_5",  
+          "armlink_6",  
+          "fingerlink_2",
+          "fingertip_2",
+        ]

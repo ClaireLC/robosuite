@@ -66,8 +66,8 @@ class JR2Env(MujocoEnv):
         """Resets the pose of the arm and grippers."""
         print("RESET")
         super()._reset_internal()
+        #print(self.sim.data.qpos)
         self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos
-
         #print("data\n {}".format(self.sim.data.qpos))
 
     def _get_reference(self):
@@ -105,7 +105,9 @@ class JR2Env(MujocoEnv):
             for actuator in self.sim.model.actuator_names
             if actuator.startswith("vel")
         ]
-        print(self.sim.model.actuator_names)
+        #print(self._ref_joint_vel_actuator_indexes)
+    
+        self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
 
     def move_indicator(self, pos):
         """Moves the position of the indicator object to @pos."""
@@ -116,8 +118,18 @@ class JR2Env(MujocoEnv):
 
     # Note: Overrides super
     def _pre_action(self, action):
-        print("Action: {}".format(action))
-        print("ncon: {}".format(self.sim.data.ncon))
+        #print("Action: {}".format(action))
+        #print("ncon: {}".format(self.sim.data.ncon))
+
+        # Transate robot's x_vel to x and y velocities for x and y actuators
+        rootwz_ind = self.sim.model.get_joint_qpos_addr("rootwz")
+        rootx_ind = self.sim.model.get_joint_qpos_addr("rootx")
+        rooty_ind = self.sim.model.get_joint_qpos_addr("rooty")
+        theta = self.sim.data.qpos[rootwz_ind]
+        new_velx = action[rootx_ind] * np.cos(theta)
+        new_vely = action[rootx_ind] * np.sin(theta)
+        action[rootx_ind] = new_velx
+        action[rooty_ind] = new_vely
         self.sim.data.ctrl[:] = action
         
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
@@ -169,6 +181,7 @@ class JR2Env(MujocoEnv):
             robot-state: contains robot-centric information.
         """
         di = super()._get_observation()
+
         # proprioceptive features
         di["joint_pos"] = np.array(
             [self.sim.data.qpos[x] for x in self._ref_joint_pos_indexes]
@@ -176,10 +189,14 @@ class JR2Env(MujocoEnv):
         di["joint_vel"] = np.array(
             [self.sim.data.qvel[x] for x in self._ref_joint_vel_indexes]
         )
+        di["r_eef_xpos"] = self._r_eef_xpos
+  
         robot_states = [
-            np.sin(di["joint_pos"]),
-            np.cos(di["joint_pos"]),
+            #np.sin(di["joint_pos"]),
+            #np.cos(di["joint_pos"]),
+            di["joint_pos"],
             di["joint_vel"],
+            di["r_eef_xpos"],
         ]
 
         di["robot-state"] = np.concatenate(robot_states)
@@ -220,6 +237,11 @@ class JR2Env(MujocoEnv):
     def action_spec(self):
         low = np.ones(self.dof) * -1.
         high = np.ones(self.dof) * 1.
+      
+        # Set the y joint limits to 0
+        rooty_ind = self.sim.model.get_joint_qpos_addr("rooty")
+        low[rooty_ind] = 0.0
+        high[rooty_ind] = 0.0
         return low, high
 
     @property
@@ -285,68 +307,6 @@ class JR2Env(MujocoEnv):
         return self._right_hand_total_velocity[3:]
 
     @property
-    def _left_hand_pose(self):
-        """
-        Returns eef pose in base frame of robot.
-        """
-        return self.pose_in_base_from_name("left_hand")
-
-    @property
-    def _left_hand_total_velocity(self):
-        """
-        Returns the total eef velocity (linear + angular) in the base frame as a numpy
-        array of shape (6,)
-        """
-
-        # Use jacobian to translate joint velocities to end effector velocities.
-        Jp = self.sim.data.get_body_jacp("left_hand").reshape((3, -1))
-        Jp_joint = Jp[:, self._ref_joint_vel_indexes[7:]]
-
-        Jr = self.sim.data.get_body_jacr("left_hand").reshape((3, -1))
-        Jr_joint = Jr[:, self._ref_joint_vel_indexes[7:]]
-
-        eef_lin_vel = Jp_joint.dot(self._joint_velocities)
-        eef_rot_vel = Jr_joint.dot(self._joint_velocities)
-        return np.concatenate([eef_lin_vel, eef_rot_vel])
-
-    @property
-    def _left_hand_pos(self):
-        """
-        Returns position of eef in base frame of robot. 
-        """
-        eef_pose_in_base = self._left_hand_pose
-        return eef_pose_in_base[:3, 3]
-
-    @property
-    def _left_hand_orn(self):
-        """
-        Returns orientation of eef in base frame of robot as a rotation matrix.
-        """
-        eef_pose_in_base = self._left_hand_pose
-        return eef_pose_in_base[:3, :3]
-
-    @property
-    def _left_hand_quat(self):
-        """
-        Returns eef orientation of left hand in base from of robot.
-        """
-        return T.mat2quat(self._left_hand_orn)
-
-    @property
-    def _left_hand_vel(self):
-        """
-        Returns velocity of eef in base frame of robot.
-        """
-        return self._left_hand_total_velocity[:3]
-
-    @property
-    def _left_hand_ang_vel(self):
-        """
-        Returns angular velocity of eef in base frame of robot.
-        """
-        return self._left_hand_total_velocity[3:]
-
-    @property
     def _joint_positions(self):
         """Returns a numpy array of joint positions (angles), of dimension 14."""
         return self.sim.data.qpos[self._ref_joint_pos_indexes]
@@ -357,14 +317,9 @@ class JR2Env(MujocoEnv):
         return self.sim.data.qvel[self._ref_joint_vel_indexes]
 
     @property
-    def _l_eef_xpos(self):
-        """Returns the position of the left hand."""
-        return self.sim.data.site_xpos[self.left_eef_site_id]
-
-    @property
     def _r_eef_xpos(self):
         """Returns the position of the right hand."""
-        return self.sim.data.site_xpos[self.right_eef_site_id]
+        return self.sim.data.site_xpos[self.r_grip_site_id]
 
     def _gripper_visualization(self):
         """

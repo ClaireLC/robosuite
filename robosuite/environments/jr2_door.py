@@ -98,6 +98,9 @@ class JR2Door(JR2Env):
         in a flattened array, which is how MuJoCo stores physical simulation data.
         """
         super()._get_reference()
+        self.door_body_id = self.sim.model.body_name2id("door")
+        self.door_handle_site_id = self.sim.model.site_name2id("door_handle")
+        #print(self.sim.model.body_names)
 
     def _reset_internal(self):
         """
@@ -109,43 +112,53 @@ class JR2Door(JR2Env):
     def reward(self, action):
         """
         Reward function for the task.
-
-          1. the agent only gets the lifting reward when flipping no more than 30 degrees.
-          2. the lifting reward is smoothed and ranged from 0 to 2, capped at 2.0.
-             the initial lifting reward is 0 when the pot is on the table;
-             the agent gets the maximum 2.0 reward when the pot’s height is above a threshold.
-          3. the reaching reward is 0.5 when the left gripper touches the left handle,
-             or when the right gripper touches the right handle before the gripper geom
-             touches the handle geom, and once it touches we use 0.5
         """
-        reward = 0
+        # Distance to door
+        distance_to_handle = self._eef_distance_to_handle
+        #print("distance to door: {}".format(distance_to_handle))
+      
+        rew_reach = (1 - np.tanh(distance_to_handle))
+        #print("R: distance to door: {}".format(distance_to_handle))
+        
+        # Find contacts on gripper
+        #r_contacts = list(self.find_contacts(
+        #        ["latch","door","frame"], ["m1n6s200_end_effector","m1n6s200_link_6"]))
+
+        #print(self.sim.data.ncon)
+        #contact = self.sim.data.contact[0]
+        #print("all contacts {}".format((contact.geom1)))
+        #print("all contacts {}".format((contact.geom2)))
+        #print("all contacts {}".format(self.sim.model.geom_id2name(contact.geom1)))
+        #print("all contacts {}".format(self.sim.model.geom_id2name(contact.geom2)))
+        #print("contacts {}".format(r_contacts))
+  
+        #print("handle xpos: {}".format(self._door_handle_xpos))
+        
+        reward = rew_reach
+        #print("reward: {}".format(reward))
 
         return reward
+    
+    @property
+    def _door_xpos(self):
+        """ Returns the position of the door """
+        return self.sim.data.body_xpos[self.door_body_id]
+    
+    @property
+    def _door_handle_xpos(self):
+        """ Returns position of door handle target site """
+        return self.sim.data.site_xpos[self.door_handle_site_id]
 
     @property
-    def _handle_1_xpos(self):
-        """Returns the position of the first handle."""
-        return self.sim.data.site_xpos[self.handle_1_site_id]
-
-    @property
-    def _handle_2_xpos(self):
-        """Returns the position of the second handle."""
-        return self.sim.data.site_xpos[self.handle_2_site_id]
-
-    @property
-    def _pot_quat(self):
-        """Returns the orientation of the pot."""
-        return T.convert_quat(self.sim.data.body_xquat[self.cube_body_id], to="xyzw")
+    def _eef_distance_to_handle(self):
+        """ Returns vector from robot to door handle """
+        dist = np.linalg.norm(self._door_handle_xpos - self._r_eef_xpos )
+        return dist 
 
     @property
     def _world_quat(self):
         """World quaternion."""
         return T.convert_quat(np.array([1, 0, 0, 0]), to="xyzw")
-
-    @property
-    def _l_gripper_to_handle(self):
-        """Returns vector from the left gripper to the handle."""
-        return self._handle_1_xpos - self._l_eef_xpos
 
     @property
     def _r_gripper_to_handle(self):
@@ -166,6 +179,29 @@ class JR2Door(JR2Env):
                 contains a rendered depth map from the simulation
         """
         di = super()._get_observation()
+ 
+        # Object information
+        if self.use_object_obs:
+          # position and rotation of object
+          door_pos = self.sim.data.body_xpos[self.door_body_id]
+          door_quat = T.convert_quat(self.sim.data.body_xquat[self.door_body_id], to="xyzw")
+          #print("door pos: {}".format(door_quat))
+
+          di["door_pos"] = door_pos
+          di["door_quat"] = door_quat
+          di["door_handle_pos"] = self._door_handle_xpos 
+          di["gripper_to_handle"] = self._door_handle_xpos - self._r_eef_xpos 
+    
+          di["object_state"] = np.concatenate(
+            [
+              di["door_pos"],
+              di["door_quat"],
+              di["door_handle_pos"],
+              di["gripper_to_handle"],
+            ]
+          )
+ 
+        return di
 
     def _check_contact(self):
         """

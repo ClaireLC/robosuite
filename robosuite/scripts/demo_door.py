@@ -18,7 +18,6 @@ if __name__ == "__main__":
   )
   
   env.reset()
-  print(env.sim.data.qpos[env._ref_joint_vel_indexes])
   qpos = np.zeros(8)
   #qpos = np.zeros(10)
   #qpos[2] = np.pi / 2
@@ -29,10 +28,9 @@ if __name__ == "__main__":
   print(env.sim.data.qpos[env._ref_joint_vel_indexes])
   
   while True:
-    action_pos = [0.0,0.0, 0.0, np.pi, np.pi, 0.0, 0.0, 0.0]
-    action_vel = [0.0,0.0,0.01,0.01,0.01, 0.01, 0.01, 0.01]
-    action = action_pos + action_vel 
+    action_vel = [-0.1,0.0,0.0,0.0,0.0,0.0,0.0, 0.0, 0.0]
     obs, reward, done, _ = env.step(action_vel)
     env.render()
-    print(env.sim.data.qpos[env._ref_joint_vel_indexes])
+    print(reward)
+    #print(env.sim.data.qpos[env._ref_joint_vel_indexes])
     #time.sleep(0.1)

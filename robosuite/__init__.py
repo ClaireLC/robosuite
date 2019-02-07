@@ -10,6 +10,10 @@ from robosuite.environments.baxter_lift import BaxterLift
 from robosuite.environments.baxter_peg_in_hole import BaxterPegInHole
 from robosuite.environments.baxter_door import BaxterDoor
 
+from robosuite.environments.pr2_door import PR2Door
+
+from robosuite.environments.jr2_door import JR2Door
+
 __version__ = "0.1.0"
 __logo__ = """
       ;     /        ,--.
