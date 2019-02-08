@@ -127,7 +127,8 @@ class DoorWithHandleObject(MujocoXMLObject):
   """
 
   def __init__(self):
-        super().__init__(xml_path_completion("objects/door_dapg.xml"))  
+        #super().__init__(xml_path_completion("objects/door_dapg.xml"))  
+        super().__init__(xml_path_completion("objects/door_jr.xml"))  
 
 class TestObject(MujocoXMLObject):
   """
