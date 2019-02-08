@@ -198,7 +198,7 @@
                                             <!--<inertial pos="0 -0.037 -0.0642" quat="0.5 0.5 -0.5 0.5" mass="0.426367" diaginertia="0.0001428 7.73497e-05 7.73497e-05" />-->
                                             <joint name="m1n6s200_joint_5" pos="0 0 0" axis="0 0 1" limited="true" range="-6.28319 6.28319" />
                                             <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="wrist" class="viz"/>
-                                            <geom type="cylinder" pos="0 0 0" size="0.03 0.03" quat="1 0 0 0" class="coll" name="armlink_5"/>
+                                            <geom type="cylinder" pos="0 0 -0.02" size="0.03 0.03" quat="1 0 0 0" class="coll" name="armlink_5"/>
                                             <body name="m1n6s200_link_6" pos="0 -0.03703 -0.06414" quat="0 0 0.5 0.866025">
                                                 <inertial pos="0 0 -0.06" quat="0.5 0.5 -0.5 0.5" mass="0.78" diaginertia="0.000624 0.000370499 0.000370499" />
                                                 <joint name="m1n6s200_joint_6" pos="0 0 0" axis="0 0 1" limited="true" range="-6.28319 6.28319" />
@@ -208,7 +208,7 @@
                                                     <inertial pos="0 0 0" mass="1e-09" diaginertia="0 0 0" />
                                                     <!--<geom size="5e-05 5e-05 5e-05" type="box" /> -->
                                                     <!-- Site -->
-                                                    <site name="r_grip_site" pos="0 0 0" size="0.01" rgba="1 0 0 1" type="sphere" class="site"/>
+                                                    <site name="r_grip_site" pos="0 0.04 0" size="0.01" rgba="1 0 0 1" type="sphere" class="site"/>
                                                 </body>
                                                 <body name="m1n6s200_link_finger_1" pos="-0.0025 0.03095 -0.11482" quat="0.314405 -0.633364 -0.314405 0.633364">
                                                     <inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />
@@ -229,8 +229,10 @@
                                                     <body name="m1n6s200_link_finger_tip_2" pos="0.044 -0.003 0">
                                                         <inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />
                                                         <!--<geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="finger_distal" class="viz"/>-->
-                                                        <geom type="cylinder" pos="0.01 0.04 0" quat="0.7071 -0.7071 0 0" size="0.01 0.04" class="viz"/>
-                                                        <geom type="cylinder" pos="0.01 0.04 0" quat="0.7071 -0.7071 0 0" size="0.01 0.04" class="coll" name="fingertip_2"/>
+                                                        <geom type="cylinder" pos="0.015 0.04 0" quat="0.7071 -0.7071 0 0" size="0.01 0.04" class="viz"/>
+                                                        <geom type="cylinder" pos="0.0 0.08 0" quat="1 0 1 0" size="0.01 0.025" class="viz"/>
+                                                        <geom type="cylinder" pos="0.015 0.04 0" quat="0.7071 -0.7071 0 0" size="0.01 0.04" class="coll" name="fingertip_2"/>
+                                                        <geom type="cylinder" pos="0.0 0.08 0" quat="1 0 1 0" size="0.01 0.025" class="coll" name="fingertip_2_hook"/>
                                                     </body>
                                                 </body>
                                             </body>
