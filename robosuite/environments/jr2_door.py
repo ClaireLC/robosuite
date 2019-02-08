@@ -99,6 +99,7 @@ class JR2Door(JR2Env):
         """
         super()._get_reference()
         self.door_body_id = self.sim.model.body_name2id("door")
+        self.door_latch_id = self.sim.model.body_name2id("latch")
         self.door_handle_site_id = self.sim.model.site_name2id("door_handle")
         #print(self.sim.model.body_names)
 
@@ -150,6 +151,11 @@ class JR2Door(JR2Env):
         return self.sim.data.site_xpos[self.door_handle_site_id]
 
     @property
+    def _door_latch_xquat(self):
+        """ Returns angle of door latch """
+        return self.sim.data.body_xquat[self.door_latch_id]
+
+    @property
     def _eef_distance_to_handle(self):
         """ Returns vector from robot to door handle """
         dist = np.linalg.norm(self._door_handle_xpos - self._r_eef_xpos )
@@ -182,7 +188,7 @@ class JR2Door(JR2Env):
  
         # Object information
         if self.use_object_obs:
-          # position and rotation of object
+          # position and rotation of object in world frame
           door_pos = self.sim.data.body_xpos[self.door_body_id]
           door_quat = T.convert_quat(self.sim.data.body_xquat[self.door_body_id], to="xyzw")
           #print("door pos: {}".format(door_quat))
@@ -190,14 +196,17 @@ class JR2Door(JR2Env):
           di["door_pos"] = door_pos
           di["door_quat"] = door_quat
           di["door_handle_pos"] = self._door_handle_xpos 
-          di["gripper_to_handle"] = self._door_handle_xpos - self._r_eef_xpos 
+          di["eef_to_handle"] = self._door_handle_xpos - self._r_eef_xpos 
+          di["handle_quat"] =  self._door_latch_xquat
+          #print(di["handle_quat"])
     
           di["object_state"] = np.concatenate(
             [
               di["door_pos"],
               di["door_quat"],
               di["door_handle_pos"],
-              di["gripper_to_handle"],
+              di["eef_to_handle"],
+              di["handle_quat"],
             ]
           )
  

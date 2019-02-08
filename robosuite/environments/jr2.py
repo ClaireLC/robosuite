@@ -120,17 +120,18 @@ class JR2Env(MujocoEnv):
     def _pre_action(self, action):
         #print("Action: {}".format(action))
         #print("ncon: {}".format(self.sim.data.ncon))
-
+        new_action = action.copy().tolist()
         # Transate robot's x_vel to x and y velocities for x and y actuators
         rootwz_ind = self.sim.model.get_joint_qpos_addr("rootwz")
         rootx_ind = self.sim.model.get_joint_qpos_addr("rootx")
         rooty_ind = self.sim.model.get_joint_qpos_addr("rooty")
+
         theta = self.sim.data.qpos[rootwz_ind]
         new_velx = action[rootx_ind] * np.cos(theta)
         new_vely = action[rootx_ind] * np.sin(theta)
-        action[rootx_ind] = new_velx
-        action[rooty_ind] = new_vely
-        self.sim.data.ctrl[:] = action
+        new_action[rootx_ind] = new_velx
+        new_action.insert(1,new_vely)
+        self.sim.data.ctrl[:] = new_action
         
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
         # for certain controllers. They later get normalized to the control range.
@@ -186,6 +187,7 @@ class JR2Env(MujocoEnv):
         di["joint_pos"] = np.array(
             [self.sim.data.qpos[x] for x in self._ref_joint_pos_indexes]
         )
+        #print(di["joint_pos"])
         di["joint_vel"] = np.array(
             [self.sim.data.qvel[x] for x in self._ref_joint_vel_indexes]
         )
@@ -238,10 +240,6 @@ class JR2Env(MujocoEnv):
         low = np.ones(self.dof) * -1.
         high = np.ones(self.dof) * 1.
       
-        # Set the y joint limits to 0
-        rooty_ind = self.sim.model.get_joint_qpos_addr("rooty")
-        low[rooty_ind] = 0.0
-        high[rooty_ind] = 0.0
         return low, high
 
     @property
@@ -318,7 +316,7 @@ class JR2Env(MujocoEnv):
 
     @property
     def _r_eef_xpos(self):
-        """Returns the position of the right hand."""
+        """Returns the position of the right hand in world frame."""
         return self.sim.data.site_xpos[self.r_grip_site_id]
 
     def _gripper_visualization(self):
