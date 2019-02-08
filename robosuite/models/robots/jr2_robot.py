@@ -18,7 +18,7 @@ class JR2(Robot):
 
     @property
     def dof(self):
-        return 9
+        return 8
 
     @property
     def joints(self):
