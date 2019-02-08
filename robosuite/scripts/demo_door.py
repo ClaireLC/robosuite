@@ -27,8 +27,8 @@ if __name__ == "__main__":
   env.render()
   print(env.sim.data.qpos[env._ref_joint_vel_indexes])
   
+  action_vel = np.zeros(8)
   while True:
-    action_vel = [-0.1,0.0,0.0,0.0,0.0,0.0,0.0, 0.0, 0.0]
     obs, reward, done, _ = env.step(action_vel)
     env.render()
     print(reward)

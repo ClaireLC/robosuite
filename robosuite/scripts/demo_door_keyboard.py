@@ -31,13 +31,11 @@ if __name__ == "__main__":
       )
 
   env.reset()
-  qpos = np.zeros(8)
-  qpos[3] = np.pi  
-  qpos[4] = np.pi  
-  #env.set_robot_joint_positions([qpos])
+  qpos = np.array([4.14576165e-01,-4.83555008e-02, -1.71113779e-01,-1.71592774e+00, 2.74424796e+00, 3.33114205e+00, 1.71887160e+00, 7.30155817e-03, 4.25708286e-05])
+  env.set_robot_joint_positions([qpos])
   env.render()
   #print(env.sim.data.qpos[env._ref_joint_vel_indexes])
-  action_vel = [0.0,0.0,0.0,0.0,0.0, 0.0, 0.0, 0.0,0.0]
+  action_vel = np.zeros(8)
   device.start_control()
   
   while True:
