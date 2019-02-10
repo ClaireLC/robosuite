@@ -182,6 +182,7 @@ class JR2Env(MujocoEnv):
             robot-state: contains robot-centric information.
         """
         di = super()._get_observation()
+        self._check_contact()
 
         # proprioceptive features
         di["joint_pos"] = np.array(

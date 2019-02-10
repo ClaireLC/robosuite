@@ -5,7 +5,7 @@ import robosuite.utils.transform_utils as T
 from robosuite.environments.baxter import BaxterEnv
 from robosuite.environments.jr2 import JR2Env
 
-from robosuite.models.objects import DoorWithHandleObject,CanObject,TestObject, CanVisualObject
+from robosuite.models.objects import DoorPullNoLatchObject,CanObject,TestObject, CanVisualObject
 from robosuite.models.arenas import TableArena, EmptyArena
 from robosuite.models.robots import Baxter
 from robosuite.models.tasks import DoorTask
@@ -41,11 +41,8 @@ class JR2Door(JR2Env):
         """
 
         # initialize the door
-        #self.door = TestObject()
-        self.door = DoorWithHandleObject()
-        self.can = CanObject()
+        self.door = DoorPullNoLatchObject()
         self.mujoco_objects = OrderedDict([("Door", self.door)])
-        #self.mujoco_objects = OrderedDict([("Can", self.can)])
 
         # whether to use ground-truth object states
         self.use_object_obs = use_object_obs
@@ -55,7 +52,6 @@ class JR2Door(JR2Env):
 
         super().__init__(
             **kwargs
-            #gripper_left=gripper_type_left, gripper_right=gripper_type_right, **kwargs
         )
 
     def _load_model(self):
@@ -71,26 +67,14 @@ class JR2Door(JR2Env):
         if self.use_indicator_object:
             self.mujoco_arena.add_pos_indicator()
         
-        #self.model.merge(self.mujoco_arena)
-        #self.model.merge(self.mujoco_robot)
-
         self.model = DoorTask(
           self.mujoco_arena,
           self.mujoco_robot,
           self.mujoco_objects,
         )
         
-        # The sawyer robot has a pedestal, we want to align it with the table
-        #self.mujoco_arena.set_origin([0.45 + self.table_full_size[0] / 2, 0, 0])
-
         self.model.place_objects()
   
-        # Load door object
-        #self.door_obj = self.door.get_collision(name="door", site=True)
-        #self.model.merge(self.door)
-        #self.model.merge(self.can)
-        #self.model.worldbody.find(".//body[@name='left_hand']").append(self.door_obj)
-
     def _get_reference(self):
         """
         Sets up references to important components. A reference is typically an
@@ -101,6 +85,7 @@ class JR2Door(JR2Env):
         self.door_body_id = self.sim.model.body_name2id("door")
         self.door_latch_id = self.sim.model.body_name2id("latch")
         self.door_handle_site_id = self.sim.model.site_name2id("door_handle")
+        self.door_hinge_joint_id = self.sim.model.joint_name2id("door_hinge")
         #print(self.sim.model.body_names)
 
     def _reset_internal(self):
@@ -117,21 +102,27 @@ class JR2Door(JR2Env):
         # Distance to door
         distance_to_handle = self._eef_distance_to_handle
         #print("distance to door: {}".format(distance_to_handle))
-      
+
+        # Angle of door body (in door object frame?)
+        door_hinge_angle = self._door_hinge_pos
+
         rew_reach = (1 - np.tanh(distance_to_handle))
         #print("R: distance to door: {}".format(distance_to_handle))
         
-        # Find contacts on gripper
-        #r_contacts = list(self.find_contacts(
-        #        ["latch","door","frame"], ["m1n6s200_end_effector","m1n6s200_link_6"]))
+        # Penalize self contacts (arm with body)
+        self_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms,self.mujoco_robot.body_contact_geoms) 
+        self_con_num = len(list(self_con))
+        #print(self_con_num)
 
-        #print(self.sim.data.ncon)
-        #contact = self.sim.data.contact[0]
-        #print("all contacts {}".format((contact.geom1)))
-        #print("all contacts {}".format((contact.geom2)))
-        #print("all contacts {}".format(self.sim.model.geom_id2name(contact.geom1)))
-        #print("all contacts {}".format(self.sim.model.geom_id2name(contact.geom2)))
-        #print("contacts {}".format(r_contacts))
+        # Contact with door handle
+        door_handle_con = self.find_contacts(self.mujoco_robot.gripper_contact_geoms,self.mujoco_objects["Door"].handle_contact_geoms)
+        door_handle_con_num = len(list(door_handle_con))
+        #print(door_handle_con_num)
+
+        # Contact with parts of door that are not handle
+        door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms + self.mujoco_robot.arm_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms)
+        door_con_num = len(list(door_con))
+        #print(door_con_num)
   
         #print("handle xpos: {}".format(self._door_handle_xpos))
         
@@ -154,6 +145,11 @@ class JR2Door(JR2Env):
     def _door_latch_xquat(self):
         """ Returns angle of door latch """
         return self.sim.data.body_xquat[self.door_latch_id]
+
+    @property
+    def _door_hinge_pos(self):
+        """ Returns angle of door hinge joint """
+        return self.sim.data.qpos[self.door_hinge_joint_id]
 
     @property
     def _eef_distance_to_handle(self):
@@ -216,17 +212,7 @@ class JR2Door(JR2Env):
         """
         Returns True if gripper is in contact with an object.
         """
-        collision = False
-        contact_geoms = (
-            self.gripper_right.contact_geoms() + self.gripper_left.contact_geoms()
-        )
-        for contact in self.sim.data.contact[: self.sim.data.ncon]:
-            if (
-                self.sim.model.geom_id2name(contact.geom1) in contact_geoms
-                or self.sim.model.geom_id2name(contact.geom2) in contact_geoms
-            ):
-                collision = True
-                break
+        collision = super()._check_contact()
         return collision
 
     def _check_success(self):
