@@ -46,15 +46,22 @@ class JR2(Robot):
     @property
     def visualization_sites(self):
         reutrn ["r_grip_site",]
-  
+
     @property
-    def contact_geoms(self):
+    def body_contact_geoms(self):
         return[
           "body",
           "neck",
           "head",
           "front_caster",
           "rear_caster",
+          "l_wheel_link",
+          "r_wheel_link",
+        ]
+  
+    @property
+    def arm_contact_geoms(self):
+        return[
           "armlink_base",
           "armlink_2",  
           "armlink_3",  
@@ -62,4 +69,13 @@ class JR2(Robot):
           "armlink_6",  
           "fingerlink_2",
           "fingertip_2",
+          "fingertip_2_hook",
+        ]
+
+    @property
+    def gripper_contact_geoms(self):
+        return[
+          "fingerlink_2",
+          "fingertip_2",
+          "fingertip_2_hook",
         ]
