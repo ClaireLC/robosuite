@@ -14,7 +14,7 @@ from .xml_objects import (
     CerealVisualObject,
     CanVisualObject,
     PlateWithHoleObject,
-    DoorWithHandleObject,
+    DoorPullNoLatchObject,
     TestObject,
 )
 

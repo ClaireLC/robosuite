@@ -121,14 +121,30 @@ class PlateWithHoleObject(MujocoXMLObject):
     def __init__(self):
         super().__init__(xml_path_completion("objects/plate-with-hole.xml"))
 
-class DoorWithHandleObject(MujocoXMLObject):
+class DoorPullNoLatchObject(MujocoXMLObject):
   """
-  Door with handle
+  Door: pull with no latch
   """
 
   def __init__(self):
         #super().__init__(xml_path_completion("objects/door_dapg.xml"))  
-        super().__init__(xml_path_completion("objects/door_jr.xml"))  
+        super().__init__(xml_path_completion("objects/door_pull_no_latch.xml"))  
+
+  @property
+  def handle_contact_geoms(self):
+      return[
+        "latch_g1",
+      ]
+
+  @property
+  def door_contact_geoms(self):
+      return[
+        "door_box",
+        "door_r_cyl",
+        "door_l_cyl",
+        "l_frame",
+        "r_frame",
+      ]
 
 class TestObject(MujocoXMLObject):
   """
