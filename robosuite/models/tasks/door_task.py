@@ -56,7 +56,7 @@ class DoorTask(Task):
 
     def place_objects(self):
         """Places objects randomly until no collisions or max iterations hit."""
-        pos_arr = [1.3,-0.05,1.0]
+        pos_arr = [1.1,-0.05,1.0]
         quat_arr = [1, 0, 0, -1]
         index = 0
         for k, obj_name in enumerate(self.mujoco_objects):
