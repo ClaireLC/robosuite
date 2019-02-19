@@ -9,7 +9,7 @@ class JR2(Robot):
     def __init__(self):
         super().__init__(xml_path_completion("robots/jr2/jr2_with_arm.xml"))
 
-        self.bottom_offset = np.array([0, 0, 0])
+        self.bottom_offset = np.array([0, 0, -0.01])
 
     def set_base_xpos(self, pos):
         """Places the robot on position @pos."""
@@ -38,9 +38,7 @@ class JR2(Robot):
 
     @property
     def init_qpos(self):
-        pos = np.zeros(9)
-        pos[4] = np.pi - 0.1
-        pos[5] = np.pi - 0.1
+        pos = np.array([ 3.71955388e-01, -4.32114760e-02, -5.92153450e-02, -1.71517591e+00,2.83001900e+00,3.37765872e+00,1.71800951e+00,1.87382209e-02,-1.78553740e-03])
         return pos
     
     @property

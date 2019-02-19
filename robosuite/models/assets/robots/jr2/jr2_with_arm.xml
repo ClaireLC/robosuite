@@ -36,9 +36,9 @@
 <worldbody>
 <body name="base_footprint">
         <!--<joint name="root" type="free" pos="0 0 0" damping="20"/>-->
-        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0" damping="50"/>
-        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0" damping="50"/>
-        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="50"/>
+        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="100" frictionloss="0"/>
+        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="100" frictionloss="0"/>
+        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="100" frictionloss="0"/>
         <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
         <body name="base_link" pos="0 0 0">
             <body name="base_chassis_link" pos="0 0 0.160568">
@@ -55,13 +55,13 @@
                     <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass="20" diaginertia="0.578884 0.303625 0.303625" />
                     <!--<joint name="left_wheel" pos="0 0 0" axis="0 1 0" /> -->
                     <geom size="0.2406 0.0461245" quat="0.707107 -0.707106 0 0" type="cylinder" class="viz"/>
-                    <geom size="0.2406 0.0461245" pos="0 0 0.01" quat="0.707107 0.707106 0 0" type="cylinder" class="coll" name="l_wheel_link"/>
+                    <geom size="0.2406 0.0461245" pos="0 0 0.0" quat="0.707107 0.707106 0 0" type="cylinder" class="coll" name="l_wheel_link"/>
                 </body>
                 <body name="right_wheel_link" pos="0 -0.27105 0.08">
                     <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass="20" diaginertia="0.578884 0.303625 0.303625" />
                     <!--<joint name="right_wheel" pos="0 0 0" axis="0 1 0" /> -->
                     <geom size="0.2406 0.0461245" quat="0.707107 0.707106 0 0" type="cylinder" class="viz"/>
-                    <geom size="0.2406 0.0461245" pos="0 0 0.01" quat="0.707107 0.707106 0 0" type="cylinder" class="coll" name="r_wheel_link"/>
+                    <geom size="0.2406 0.0461245" pos="0 0 0.0" quat="0.707107 0.707106 0 0" type="cylinder" class="coll" name="r_wheel_link"/>
                 </body>
                 <body name="front_caster_pivot_link" pos="0.385841 0 0.0511" quat="1.32679e-06 0 0 1">
                     <inertial pos="0 0 0" mass="0.0001" diaginertia="1e-07 1e-07 1e-07" />

@@ -73,7 +73,9 @@ class JR2Door(JR2Env):
           self.mujoco_objects,
         )
         
-        self.model.place_objects()
+        door_pos = [1.3,-0.05,1.0]
+        door_quat = [1, 0, 0, -1]
+        self.model.place_objects(door_pos,door_quat)
   
     def _get_reference(self):
         """

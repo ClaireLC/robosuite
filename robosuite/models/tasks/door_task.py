@@ -54,10 +54,8 @@ class DoorTask(Task):
             #    self.max_horizontal_radius, obj_mjcf.get_horizontal_radius()
             #)
 
-    def place_objects(self):
+    def place_objects(self,pos_arr,quat_arr):
         """Places objects randomly until no collisions or max iterations hit."""
-        pos_arr = [1.1,-0.05,1.0]
-        quat_arr = [1, 0, 0, -1]
         index = 0
         for k, obj_name in enumerate(self.mujoco_objects):
             #print(array_to_string(pos_arr))
