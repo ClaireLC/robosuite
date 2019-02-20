@@ -36,9 +36,9 @@
 <worldbody>
 <body name="base_footprint">
         <!--<joint name="root" type="free" pos="0 0 0" damping="20"/>-->
-        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="100" frictionloss="0"/>
-        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="100" frictionloss="0"/>
-        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="100" frictionloss="0"/>
+        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="100" frictionloss="2"/>
+        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="100" frictionloss="2"/>
+        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="100" frictionloss="2"/>
         <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
         <body name="base_link" pos="0 0 0">
             <body name="base_chassis_link" pos="0 0 0.160568">
@@ -259,12 +259,12 @@
     </contact> -->
 
     <actuator>
-      <velocity joint="rootx" name="vel_rootx" kv="10"   ctrlrange="-2 2" ctrllimited="true"/>
-      <velocity joint="rooty" name="vel_rooty" kv="10"   ctrlrange="-2 2" ctrllimited="true"/>
-      <velocity joint="rootwz" name="vel_rootwz" kv="10" ctrlrange="-2 2" ctrllimited="true"/>
-      <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="10" ctrlrange="-2 2" ctrllimited="true" />
-      <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="5" ctrlrange="-2 2" ctrllimited="true"/> 
-      <velocity joint="m1n6s200_joint_3" name="vel_m1n6s200_joint_3" kv="2" ctrlrange="-2 2" ctrllimited="true"/>
+      <velocity joint="rootx" name="vel_rootx" kv="10"   ctrlrange="-0.1 0.1" ctrllimited="true"/>
+      <velocity joint="rooty" name="vel_rooty" kv="10"   ctrlrange="-0.1 0.1" ctrllimited="true"/>
+      <velocity joint="rootwz" name="vel_rootwz" kv="10" ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="10" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="5" ctrlrange="-1 1" ctrllimited="true"/> 
+      <velocity joint="m1n6s200_joint_3" name="vel_m1n6s200_joint_3" kv="2" ctrlrange="-1 1" ctrllimited="true"/>
       <velocity joint="m1n6s200_joint_4" name="vel_m1n6s200_joint_4" kv="1" ctrlrange="-2 2" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_5" name="vel_m1n6s200_joint_5" kv="0.1" ctrlrange="-2 2" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_6" name="vel_m1n6s200_joint_6" kv="0.01" ctrlrange="-2 2" ctrllimited="true" />
