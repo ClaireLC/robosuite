@@ -110,7 +110,7 @@ class JR2Door(JR2Env):
 
         rew_reach = (1 - np.tanh(distance_to_handle))
         #print("R: distance to door: {}".format(distance_to_handle))
-        rew_door_angle = door_hinge_angle
+        rew_door_angle = 10 * door_hinge_angle
         
         # Penalize self contacts (arm with body)
         self_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms,self.mujoco_robot.body_contact_geoms) 
@@ -121,6 +121,8 @@ class JR2Door(JR2Env):
         door_handle_con = self.find_contacts(self.mujoco_robot.gripper_contact_geoms,self.mujoco_objects["Door"].handle_contact_geoms)
         door_handle_con_num = len(list(door_handle_con))
         #print(door_handle_con_num)
+      
+        rew_handle_contact = 10 * door_handle_con_num
 
         # Contact with parts of door that are not handle
         door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms + self.mujoco_robot.arm_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms)
@@ -129,8 +131,8 @@ class JR2Door(JR2Env):
   
         #print("handle xpos: {}".format(self._door_handle_xpos))
         
-        reward = rew_reach + rew_door_angle
-        #print("reward: {}".format(reward))
+        reward = rew_reach + rew_door_angle + rew_handle_contact
+        print("(reach,door): ({},{},{})".format(rew_reach, rew_door_angle,rew_handle_contact))
 
         return reward
     
