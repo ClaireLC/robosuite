@@ -120,8 +120,13 @@ class JR2Env(MujocoEnv):
     def _pre_action(self, action):
         #print("Action: {}".format(action))
         #print("ncon: {}".format(self.sim.data.ncon))
+        
+        # action is an 8-dim vector (x,theta,arm joint velocities)
+        # Copy the action to a list
         new_action = action.copy().tolist()
+
         # Transate robot's x_vel to x and y velocities for x and y actuators
+        # Get indices corresponding to x,y,theta base joints
         rootwz_ind = self.sim.model.get_joint_qpos_addr("rootwz")
         rootx_ind = self.sim.model.get_joint_qpos_addr("rootx")
         rooty_ind = self.sim.model.get_joint_qpos_addr("rooty")
@@ -129,33 +134,41 @@ class JR2Env(MujocoEnv):
         theta = self.sim.data.qpos[rootwz_ind]
         new_velx = action[rootx_ind] * np.cos(theta)
         new_vely = action[rootx_ind] * np.sin(theta)
+  
+        # Update x velocity in new_action
         new_action[rootx_ind] = new_velx
+        # Insert h velocity into new_action
         new_action.insert(1,new_vely)
-        self.sim.data.ctrl[:] = new_action
+
+        # Set x,y velocity commands to 0, to solve the problem of sliding base
+        new_action[0] = 0.0
+        new_action[1] = 0.0
+        new_action[2] = 0.0
         
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
         # for certain controllers. They later get normalized to the control range.
-        #if self.rescale_actions:
-        #    action = np.clip(action, -1, 1)
+        if self.rescale_actions:
+            new_action = np.clip(new_action, -1, 1)
 
-        ## Action is stored as [right arm, left arm, right gripper?, left gripper?]
-        ## We retrieve the relevant actions.
-        #last = self.mujoco_robot.dof  # Degrees of freedom in arm, i.e. 14
-        #arm_action = action[:last]
-
-        #action = arm_action
-
-        #if self.rescale_actions:
-        #    # rescale normalized action to control ranges
-        #    ctrl_range = self.sim.model.actuator_ctrlrange
-        #    bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
-        #    weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
-        #    applied_action = bias + weight * action
-        #else:
-        #    applied_action = action
+        if self.rescale_actions:
+            # rescale normalized action to control ranges
+            ctrl_range = self.sim.model.actuator_ctrlrange
+            bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
+            weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
+            applied_action = bias + weight * new_action
+        else:
+            applied_action = new_action
 
         #self.sim.data.ctrl[:] = applied_action
+        self.sim.data.qvel[0] = 0.0
+        self.sim.data.qvel[1] = 0.0
+        self.sim.data.qvel[2] = 0.0
+    
+        self.sim.data.ctrl[:] = applied_action
+        #self.sim.data.qvel[0] = weight[0] * new_velx
+        #self.sim.data.qvel[1] = weight[1] * new_vely
 
+        #print("{},{},{}".format(applied_action,weight[0] * new_velx,weight[1] * new_vely))
         # gravity compensation
         self.sim.data.qfrc_applied[
             self._ref_joint_vel_indexes
