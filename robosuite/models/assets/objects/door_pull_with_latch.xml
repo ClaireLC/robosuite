@@ -33,12 +33,12 @@
             <body name="door" pos="0.45 0 0">
                 <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="2.43455" diaginertia="0.0913751 0.0521615 0.043714" />
                 <joint name="door_hinge" pos="0.45 0 0" axis="0 0 1" range="0.0 1.57" damping="1" frictionloss="1" limited="true"/>
-                <geom size="0.35 0.05 1." type="box" friction="1 1 1" material="MatWood" class="viz"/>
-                <geom size="0.05 1." pos="0.35 0 0" type="cylinder" material="MatWood" class="viz" />
-                <geom size="0.05 1." pos="-0.35 0 0" type="cylinder" material="MatWood" class="viz" />
-                <geom size="0.35 0.05 1." type="box" friction="1 1 1" class="coll" name="door_box"/>
-                <geom size="0.05 1." pos="0.35 0 0" type="cylinder"  class="coll" name="door_r_cyl"/>
-                <geom size="0.05 1." pos="-0.35 0 0" type="cylinder"  class="coll" name="door_l_cyl" />
+                <geom size="0.35 0.05 .99" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+                <geom size="0.05      .99" pos="0.35 0 0" type="cylinder" material="MatWood" class="viz" />
+                <geom size="0.05      .99" pos="-0.35 0 0" type="cylinder" material="MatWood" class="viz" />
+                <geom size="0.35 0.05 .99" type="box" friction="1 1 1" class="coll" name="door_box"/>
+                <geom size="0.05      .99" pos="0.35 0 0" type="cylinder"  class="coll" name="door_r_cyl"/>
+                <geom size="0.05      .99" pos="-0.35 0 0" type="cylinder"  class="coll" name="door_l_cyl" />
                 <body name="latch" pos="-0.25 0 -0.025">
                     <inertial pos="-0.017762 0.0138544 0" quat="0.365653 0.605347 -0.36522 0.605365" mass="0.1" diaginertia="0.0483771 0.0410001 0.0111013" />
                     <joint name="latch_joint" pos="0 0 0" axis="0 1 0" range="-0.1 1.57" frictionloss="0.1" damping="0" limited="true"/>
