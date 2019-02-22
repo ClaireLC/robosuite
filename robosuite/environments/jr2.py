@@ -15,10 +15,13 @@ class JR2Env(MujocoEnv):
         self,
         use_indicator_object=False,
         rescale_actions=True,
+        bot_motion="mmp",
         **kwargs
     ):
         """
         Args:
+            bot_motion (str): "static" for static base, "mmp" for mobile base
+
             use_indicator_object (bool): if True, sets up an indicator object that 
                 is useful for debugging.
 
@@ -55,6 +58,7 @@ class JR2Env(MujocoEnv):
         """
         self.use_indicator_object = use_indicator_object
         self.rescale_actions = rescale_actions
+        self.bot_motion = bot_motion
         super().__init__(**kwargs)
 
     def _load_model(self):
@@ -143,7 +147,6 @@ class JR2Env(MujocoEnv):
         # Set x,y velocity commands to 0, to solve the problem of sliding base
         new_action[0] = 0.0
         new_action[1] = 0.0
-        new_action[2] = 0.0
         
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
         # for certain controllers. They later get normalized to the control range.
@@ -159,14 +162,15 @@ class JR2Env(MujocoEnv):
         else:
             applied_action = new_action
 
-        #self.sim.data.ctrl[:] = applied_action
-        self.sim.data.qvel[0] = 0.0
-        self.sim.data.qvel[1] = 0.0
-        self.sim.data.qvel[2] = 0.0
+        if (self.bot_motion == "static"):
+          self.sim.data.qvel[0] = 0.0
+          self.sim.data.qvel[1] = 0.0
+          self.sim.data.qvel[2] = 0.0
+        else:
+          self.sim.data.qvel[0] = weight[0] * new_velx
+          self.sim.data.qvel[1] = weight[1] * new_vely
     
         self.sim.data.ctrl[:] = applied_action
-        #self.sim.data.qvel[0] = weight[0] * new_velx
-        #self.sim.data.qvel[1] = weight[1] * new_vely
 
         #print("{},{},{}".format(applied_action,weight[0] * new_velx,weight[1] * new_vely))
         # gravity compensation

@@ -5,7 +5,7 @@ import robosuite.utils.transform_utils as T
 from robosuite.environments.baxter import BaxterEnv
 from robosuite.environments.jr2 import JR2Env
 
-from robosuite.models.objects import DoorPullNoLatchObject,CanObject,TestObject, CanVisualObject
+from robosuite.models.objects import DoorPullNoLatchObject, DoorPullWithLatchObject
 from robosuite.models.arenas import TableArena, EmptyArena
 from robosuite.models.robots import Baxter
 from robosuite.models.tasks import DoorTask
@@ -14,35 +14,52 @@ from robosuite.models import MujocoWorldBase
 
 class JR2Door(JR2Env):
     """
-    This class corresponds to the bimanual lifting task for the Baxter robot.
+    This class corresponds to door opening task for JR2.
     """
 
     def __init__(
         self,
-        table_full_size=(0.8, 0.8, 0.8),
-        table_friction=(1., 5e-3, 1e-4),
         use_object_obs=True,
         reward_shaping=True,
+        door_type="dpnl",
+        door_pos = [1.3,-0.05,1.0],
+        door_quat = [1, 0, 0, -1],
+        arena="e",
+        robot_pos=[0,0,0],
         **kwargs
     ):
         """
         Args:
-            table_full_size (3-tuple): x, y, and z dimensions of the table.
-
-            table_friction (3-tuple): the three mujoco friction parameters for
-                the table.
-
             use_object_obs (bool): if True, include object (pot) information in
                 the observation.
 
             reward_shaping (bool): if True, use dense rewards.
+  
+            door_type (str): type of door (pull no latch, pull with latch, push no latch, push with latch)
+    
+            door_pos ([x,y,z]): position of door
+   
+            door_quat ([w,x,y,z]): quaternion of door
 
-        Inherits the Baxter environment; refer to other parameters described there.
+            arena (str): empty or room
+
+            robot_pos ([x,y,x]): position of robot
+
+        Inherits the JR2 environment; refer to other parameters described there.
         """
 
         # initialize the door
-        self.door = DoorPullNoLatchObject()
+        if (door_type == "dpnl"):
+         self.door = DoorPullNoLatchObject()
+        elif (door_type == "dpwl"):
+         self.door = DoorPullWithLatchObject()
+
         self.mujoco_objects = OrderedDict([("Door", self.door)])
+
+        self.door_pos = door_pos
+        self.door_quat = door_quat
+        self.robot_pos = robot_pos
+        self.arena = arena
 
         # whether to use ground-truth object states
         self.use_object_obs = use_object_obs
@@ -59,11 +76,13 @@ class JR2Door(JR2Env):
         Loads the arena and pot object.
         """
         super()._load_model()
-        self.mujoco_robot.set_base_xpos([0, 0, 0])
+        self.mujoco_robot.set_base_xpos(self.robot_pos)
 
         # load model for table top workspace
         self.model = MujocoWorldBase()
-        self.mujoco_arena = EmptyArena()
+        if (self.arena == "e"):
+          self.mujoco_arena = EmptyArena()
+
         if self.use_indicator_object:
             self.mujoco_arena.add_pos_indicator()
         
@@ -73,9 +92,7 @@ class JR2Door(JR2Env):
           self.mujoco_objects,
         )
         
-        door_pos = [1.3,-0.05,1.0]
-        door_quat = [1, 0, 0, -1]
-        self.model.place_objects(door_pos,door_quat)
+        self.model.place_objects(self.door_pos,self.door_quat)
   
     def _get_reference(self):
         """
@@ -132,7 +149,7 @@ class JR2Door(JR2Env):
         #print("handle xpos: {}".format(self._door_handle_xpos))
         
         reward = rew_reach + rew_door_angle + rew_handle_contact
-        print("(reach,door): ({},{},{})".format(rew_reach, rew_door_angle,rew_handle_contact))
+        #print("(reach,door): ({},{},{})".format(rew_reach, rew_door_angle,rew_handle_contact))
 
         return reward
     
