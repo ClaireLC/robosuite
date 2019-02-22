@@ -15,6 +15,7 @@ def custom_arg_parser():
   parser.add_argument("--replay", help="Replay policy of given model, without modifying", type=str2bool, const=True, nargs='?')
   parser.add_argument("--stochastic_replay", help="Whether or not to load a stochastic model", type=str2bool, const=True, nargs='?')
   parser.add_argument("--slurm", help="Whether or not you are training on cluster", type=str2bool, const=True, nargs='?')
+  parser.add_argument("--job_id", help="SLURM job id", type=int)
 
   # Environment parameters
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
@@ -54,6 +55,9 @@ def str2bool(v):
 
 def serialize_args(args):
   ret = vars(args)["distance"]
+  if vars(args)["job_id"] is not None:
+    ret += "_" + "{}".format(vars(args)["job_id"])
+
   for key, value in vars(args).items():
     # skip config file etc. path names
     if type(value) == str:
@@ -67,6 +71,7 @@ def serialize_args(args):
     if key == "visualize": continue
     if key == "verbose": continue
     if key == "distance": continue
+    if key == "job_id": continue
 
     # Necessary to deal with length
     splits = key.split('_')
@@ -74,10 +79,14 @@ def serialize_args(args):
 
     for split in splits:
       short_key += split[0]
-    ret += "-{}.{}".format(short_key, value)
+    ret += "_{}.{}".format(short_key, value)
   if ret != "" and ret[-1] == '_':
     ret = ret[:-1]
-  return ret.replace(" ", "")
+  ret = ret.replace(" ", "")
+  ret = ret.replace(",", ".")
+  ret = ret.replace("[", "")
+  ret = ret.replace("]", "")
+  return ret
 
 def load_defaults(args):
   default_path = './default_door.json'
