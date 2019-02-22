@@ -146,11 +146,27 @@ class DoorPullNoLatchObject(MujocoXMLObject):
         "r_frame",
       ]
 
-class TestObject(MujocoXMLObject):
+class DoorPullWithLatchObject(MujocoXMLObject):
   """
-  Door
+  Door: pull with latch
   """
 
   def __init__(self):
-        super().__init__(xml_path_completion("objects/test_obj.xml"))
+        #super().__init__(xml_path_completion("objects/door_dapg.xml"))  
+        super().__init__(xml_path_completion("objects/door_pull_with_latch.xml"))  
 
+  @property
+  def handle_contact_geoms(self):
+      return[
+        "latch_g1",
+      ]
+
+  @property
+  def door_contact_geoms(self):
+      return[
+        "door_box",
+        "door_r_cyl",
+        "door_l_cyl",
+        "l_frame",
+        "r_frame",
+      ]

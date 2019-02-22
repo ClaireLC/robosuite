@@ -15,7 +15,7 @@ from .xml_objects import (
     CanVisualObject,
     PlateWithHoleObject,
     DoorPullNoLatchObject,
-    TestObject,
+    DoorPullWithLatchObject,
 )
 
 from .generated_objects import (
