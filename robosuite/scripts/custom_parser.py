@@ -17,6 +17,9 @@ def custom_arg_parser():
   parser.add_argument("--slurm", help="Whether or not you are training on cluster", type=str2bool, const=True, nargs='?')
   parser.add_argument("--job_id", help="SLURM job id", type=int)
 
+  # Device
+  parser.add_argument("--device", type=str, default="keyboard")
+
   # Environment parameters
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
   parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl'])
@@ -79,6 +82,7 @@ def serialize_args(args):
     if key == "verbose": continue
     if key == "distance": continue
     if key == "job_id": continue
+    if key == "policy": continue
 
     # Necessary to deal with length
     splits = key.split('_')
