@@ -31,11 +31,11 @@ def custom_arg_parser():
   parser.add_argument("--control_freq", help="Control frequency", type=int)
 
   # Reward coefficients
-  parser.add_argument("--rcoef_dist_to_handle", help="EEF distance to door handle reward coefficient", type=float, default=1.0)
-  parser.add_argument("--rcoef_door_angle", help="Door angle reward coefficient", type=float, default=1.0)
-  parser.add_argument("--rcoef_handle_con", help="EEF contact with door handle reward coefficient", type=float, default=1.0)
-  parser.add_argument("--rcoef_body_door_con", help="Body contact with door reward coefficient", type=float, default=0.0)
-  parser.add_argument("--rcoef_self_con", help="Self collision reward coefficient", type=float, default=0.0)
+  parser.add_argument("--rcoef_dist_to_handle", help="EEF distance to door handle reward coefficient", type=float)
+  parser.add_argument("--rcoef_door_angle", help="Door angle reward coefficient", type=float)
+  parser.add_argument("--rcoef_handle_con", help="EEF contact with door handle reward coefficient", type=float)
+  parser.add_argument("--rcoef_body_door_con", help="Body contact with door reward coefficient", type=float)
+  parser.add_argument("--rcoef_self_con", help="Self collision reward coefficient", type=float)
 
   # Learning parameters
   parser.add_argument("--rl_alg", help="RL algorithm to use", type=str, choices=['ppo1','ppo2'])
@@ -84,6 +84,9 @@ def serialize_args(args):
     if key == "job_id": continue
     if key == "policy": continue
     if key == "slurm": continue
+    if key == "stochastic_replay": continue
+    if key == "config_file": continue
+    if key == "device": continue
 
     # Necessary to deal with length
     splits = key.split('_')

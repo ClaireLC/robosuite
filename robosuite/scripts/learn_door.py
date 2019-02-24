@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import time
 import json
+import os
 
 import robosuite as suite
 from stable_baselines.common.policies import MlpPolicy,MlpLstmPolicy,MlpLnLstmPolicy
@@ -23,11 +24,21 @@ def main():
   # Create the model name with all the parameters
   
   model_dir_name = serialize_args(args)
-  model_save_path = "../../learned_models/" + model_dir_name + "/"
+  if args.model is not None:
+    model_save_path = os.path.dirname(args.model) + "/"
+  else:
+    model_save_path = "../../learned_models/" + model_dir_name + "/"
+  print("model save path:{}".format(model_save_path))
   tb_save_path = "../../tb_logs/" +  model_dir_name + "/"
   final_model_path = model_save_path + "final_" + model_dir_name
   model_load_path = args.model
   show_render = args.visualize
+
+  # Save args to json for training from checkpoints
+  if not os.path.exists(model_save_path):
+    os.makedirs(model_save_path)
+    with open(model_save_path + "args.json", 'w+') as f:
+      json.dump(vars(args),f,indent=2)
 
   env = GymWrapper(
       suite.make(

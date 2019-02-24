@@ -25,9 +25,9 @@
   "total_timesteps": 1000000,
   "control_freq": 20,
   "n_cpu": 4,
-  "dist_to_handle_coef":1,
-  "door_angle_coef"    :10,
-  "handle_con_coef"    :0,
-  "body_door_con_coef" :0,
-  "self_con_coef"      :0
+  "rcoef_dist_to_handle":1,
+  "rcoef_door_angle"    :10,
+  "rcoef_handle_con"    :0,
+  "rcoef_body_door_con" :0,
+  "rcoef_self_con"      :0
 }
