@@ -24,5 +24,10 @@
   "verbose": 1,
   "total_timesteps": 1000000,
   "control_freq": 20,
-  "n_cpu": 1
+  "n_cpu": 1,
+  "dist_to_handle_coef":1,
+  "door_angle_coef"    :10,
+  "handle_con_coef"    :0,
+  "body_door_con_coef" :0,
+  "self_con_coef"      :0
 }
