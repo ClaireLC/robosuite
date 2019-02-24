@@ -210,6 +210,10 @@
                                                     <!-- Site -->
                                                     <site name="r_grip_site" pos="0 0.04 0" size="0.01" rgba="1 0 0 1" type="sphere" class="site"/>
                                                 </body>
+                                                    <!-- Force/torque sensor site -->
+                                                <!--<body name="ft_sensor" pos="-0.0025 -0.03095 -0.11482" quat="0.633364 -0.314405 0.633364 -0.314405">
+                                                    <site name="ft_frame" pos="0.0 0.0 0.0" size="0.01 0.01 0.01" rgba="0 1 0 1" type="sphere" class="site"/>
+                                                </body>-->
                                                 <body name="m1n6s200_link_finger_1" pos="-0.0025 0.03095 -0.11482" quat="0.314405 -0.633364 -0.314405 0.633364">
                                                     <inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />
                                                     <!--<joint name="m1n6s200_joint_finger_1" pos="0 0 0" axis="0 0 1" limited="true" range="0 2" />-->
@@ -259,8 +263,8 @@
     </contact> -->
 
     <actuator>
-      <velocity joint="rootx" name="vel_rootx" kv="10"   ctrlrange="-0.1 0.1" ctrllimited="true"/>
-      <velocity joint="rooty" name="vel_rooty" kv="10"   ctrlrange="-0.1 0.1" ctrllimited="true"/>
+      <velocity joint="rootx" name="vel_rootx" kv="10"   ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="rooty" name="vel_rooty" kv="10"   ctrlrange="-1 1" ctrllimited="true"/>
       <velocity joint="rootwz" name="vel_rootwz" kv="10" ctrlrange="-1 1" ctrllimited="true"/>
       <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="10" ctrlrange="-1 1" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="5" ctrlrange="-1 1" ctrllimited="true"/> 
@@ -269,4 +273,8 @@
       <velocity joint="m1n6s200_joint_5" name="vel_m1n6s200_joint_5" kv="0.1" ctrlrange="-2 2" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_6" name="vel_m1n6s200_joint_6" kv="0.01" ctrlrange="-2 2" ctrllimited="true" />
     </actuator>
+    <sensor>
+      <force name="force_ee" site="ft_frame"/>
+      <torque name="torque_ee" site="ft_frame"/>
+    </sensor>
 </mujoco>

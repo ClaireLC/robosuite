@@ -43,7 +43,7 @@ class JR2(Robot):
     
     @property
     def visualization_sites(self):
-        reutrn ["r_grip_site",]
+        return ["r_grip_site",]
 
     @property
     def body_contact_geoms(self):
