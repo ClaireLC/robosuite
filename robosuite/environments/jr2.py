@@ -167,11 +167,12 @@ class JR2Env(MujocoEnv):
           self.sim.data.qvel[1] = 0.0
           self.sim.data.qvel[2] = 0.0
         else:
-          self.sim.data.qvel[0] = weight[0] * new_velx
-          self.sim.data.qvel[1] = weight[1] * new_vely
+          self.sim.data.qvel[0] = weight[0] * new_velx * 0.06
+          self.sim.data.qvel[1] = weight[1] * new_vely * 0.06
     
         self.sim.data.ctrl[:] = applied_action
-
+        #print(applied_action)
+        #print(self.sim.data.qvel)
         #print("{},{},{}".format(applied_action,weight[0] * new_velx,weight[1] * new_vely))
         # gravity compensation
         self.sim.data.qfrc_applied[
@@ -220,6 +221,7 @@ class JR2Env(MujocoEnv):
         ]
 
         di["robot-state"] = np.concatenate(robot_states)
+        #print(self._ft_measurement)
         return di
 
     @property
@@ -336,6 +338,13 @@ class JR2Env(MujocoEnv):
     def _r_eef_xpos(self):
         """Returns the position of the right hand in world frame."""
         return self.sim.data.site_xpos[self.r_grip_site_id]
+
+    @property
+    def _ft_measurement(self):
+        """Returns sensor measurement."""
+        print(self.sim.model.sensor_names)
+        return self.sim.data.get_sensor("torque_ee")
+        #return self.sim.data.sensordata
 
     def _gripper_visualization(self):
         """
