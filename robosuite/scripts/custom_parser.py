@@ -83,6 +83,7 @@ def serialize_args(args):
     if key == "distance": continue
     if key == "job_id": continue
     if key == "policy": continue
+    if key == "slurm": continue
 
     # Necessary to deal with length
     splits = key.split('_')
