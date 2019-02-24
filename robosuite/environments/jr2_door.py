@@ -26,6 +26,11 @@ class JR2Door(JR2Env):
         door_quat = [1, 0, 0, -1],
         arena="e",
         robot_pos=[0,0,0],
+        dist_to_handle_coef=1.0,
+        door_angle_coef=1.0,
+        handle_con_coef=1.0,
+        body_door_con_coef=0.0,
+        self_con_coef=0.0,
         **kwargs
     ):
         """
@@ -44,6 +49,16 @@ class JR2Door(JR2Env):
             arena (str): empty or room
 
             robot_pos ([x,y,x]): position of robot
+  
+            dist_to_handle_coef: reward coefficient for eef distance to handle
+
+            door_angle_coef: reward coefficient for angle of door
+  
+            handle_con_coef: reward coefficient for eef contact with handle
+
+            body_door_con_coef: reward coefficent to penalize body contact with door
+
+            self_con_coef: reward coefficient to penalize self collisions
 
         Inherits the JR2 environment; refer to other parameters described there.
         """
@@ -66,6 +81,11 @@ class JR2Door(JR2Env):
 
         # reward configuration
         self.reward_shaping = reward_shaping
+        self.dist_to_handle_coef = dist_to_handle_coef
+        self.door_angle_coef = door_angle_coef
+        self.handle_con_coef = handle_con_coef
+        self.body_door_con_coef = body_door_con_coef
+        self.self_con_coef = self_con_coef
 
         super().__init__(
             **kwargs
@@ -118,17 +138,16 @@ class JR2Door(JR2Env):
         """
         Reward function for the task.
         """
+        reward = 0
+
         # Distance to door
         distance_to_handle = self._eef_distance_to_handle
         #print("distance to door: {}".format(distance_to_handle))
+        #print("R: distance to door: {}".format(distance_to_handle))
 
         # Angle of door body (in door object frame?)
         door_hinge_angle = self._door_hinge_pos
 
-        rew_reach = (1 - np.tanh(distance_to_handle))
-        #print("R: distance to door: {}".format(distance_to_handle))
-        rew_door_angle = 10 * door_hinge_angle
-        
         # Penalize self contacts (arm with body)
         self_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms,self.mujoco_robot.body_contact_geoms) 
         self_con_num = len(list(self_con))
@@ -139,17 +158,21 @@ class JR2Door(JR2Env):
         door_handle_con_num = len(list(door_handle_con))
         #print(door_handle_con_num)
       
-        rew_handle_contact = 10 * door_handle_con_num
-
-        # Contact with parts of door that are not handle
-        door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms + self.mujoco_robot.arm_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms)
-        door_con_num = len(list(door_con))
-        #print(door_con_num)
+        # Body to door contacts
+        body_door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms + self.mujoco_objects["Door"].handle_contact_geoms)
+        body_door_con_num = len(list(body_door_con))
   
         #print("handle xpos: {}".format(self._door_handle_xpos))
         
-        reward = rew_reach + rew_door_angle + rew_handle_contact
-        #print("(reach,door): ({},{},{})".format(rew_reach, rew_door_angle,rew_handle_contact))
+        rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
+        rew_door_angle     = self.door_angle_coef * door_hinge_angle
+        rew_handle_con     = self.handle_con_coef * door_handle_con_num
+        rew_body_door_con  = self.body_door_con_coef * body_door_con_num
+        rew_self_con       = self.self_con_coef * self_con_num
+
+        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con
+
+        print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con): ({},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con))
 
         return reward
     
