@@ -87,6 +87,7 @@ def serialize_args(args):
     if key == "stochastic_replay": continue
     if key == "config_file": continue
     if key == "device": continue
+    if key == "replay": continue
 
     # Necessary to deal with length
     splits = key.split('_')
