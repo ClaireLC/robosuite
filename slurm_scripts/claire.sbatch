@@ -53,8 +53,8 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 cd /sailhome/clairech/robosuite/robosuite/scripts
 #python learn_door.py --job_id $SLURM_JOBID --config_file ~/robosuite/robosuite/scripts/touching_door.json --bot_motion mmp
 #python learn_door.py --job_id $SLURM_JOBID --config_file ~/robosuite/robosuite/scripts/touching_door.json --bot_motion static
-#python learn_door.py --job_id $SLURM_JOBID --config_file ~/robosuite/robosuite/scripts/close_door.json --bot_motion mmp
-python learn_door.py --job_id $SLURM_JOBID --config_file ~/robosuite/learned_models/close_532251_dp.1.3.-0.05.1.0_cr.0.2_rda.10_ns.2048_l.0.95_d.keyboard_rbdc.0_ra.ppo2_rsc.0_ec.0.0_rdth.1_r.False_cf.20_dq.1.0.0.-1_dt.dpnl_m.4_vc.0.5_h.1024_rp.-0.5.0.0_bm.mmp_g.0.99_nc.4_oe.10_rhc.0_a.e/args.json --model ~/robosuite/learned_models/close_532251_dp.1.3.-0.05.1.0_cr.0.2_rda.10_ns.2048_l.0.95_d.keyboard_rbdc.0_ra.ppo2_rsc.0_ec.0.0_rdth.1_r.False_cf.20_dq.1.0.0.-1_dt.dpnl_m.4_vc.0.5_h.1024_rp.-0.5.0.0_bm.mmp_g.0.99_nc.4_oe.10_rhc.0_a.e/24600model.ckpt
+python learn_door.py --job_id $SLURM_JOBID --config_file ~/robosuite/robosuite/scripts/close_door.json --bot_motion mmp --rcoef_handle_con 1 --rcoef_self_con -1 --ent_coef 0.01
+#python learn_door.py --job_id $SLURM_JOBID --config_file ~/robosuite/learned_models/close_532251_dp.1.3.-0.05.1.0_cr.0.2_rda.10_ns.2048_l.0.95_d.keyboard_rbdc.0_ra.ppo2_rsc.0_ec.0.0_rdth.1_r.False_cf.20_dq.1.0.0.-1_dt.dpnl_m.4_vc.0.5_h.1024_rp.-0.5.0.0_bm.mmp_g.0.99_nc.4_oe.10_rhc.0_a.e/args.json --model ~/robosuite/learned_models/close_532251_dp.1.3.-0.05.1.0_cr.0.2_rda.10_ns.2048_l.0.95_d.keyboard_rbdc.0_ra.ppo2_rsc.0_ec.0.0_rdth.1_r.False_cf.20_dq.1.0.0.-1_dt.dpnl_m.4_vc.0.5_h.1024_rp.-0.5.0.0_bm.mmp_g.0.99_nc.4_oe.10_rhc.0_a.e/2000800model.ckpt --total_timesteps 2000000
 
 #{{CMD}}
 
