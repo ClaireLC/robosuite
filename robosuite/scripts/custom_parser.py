@@ -7,7 +7,7 @@ def custom_arg_parser():
   parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
   # try to load default config file
-  default_path = './default_door.json'
+  default_path = '/Users/claire/mujoco-env/lib/python3.7/site-packages/robosuite/robosuite/scripts/default_door.json'
   parser.add_argument("--config_file", help=".json file to load parameters from", default=default_path)
  
   parser.add_argument("--model", help="Directory containing a previously trained model", type=str)
@@ -24,7 +24,7 @@ def custom_arg_parser():
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
   parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl'])
   parser.add_argument("--arena", help="Arena type, either empty or room", type=str, choices=['e','r'])
-  parser.add_argument("--distance", help="Distance from robot to door", type=str, choices=['touching','near','far'])
+  parser.add_argument("--distance", help="Distance from robot to door", type=str)
   parser.add_argument("--robot_pos", help="Position of door [x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_pos", help="Position of door [x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_quat", help="Position of door [w,x,y,z]", nargs='+', type=float)
@@ -105,7 +105,7 @@ def serialize_args(args):
   return ret
 
 def load_defaults(args):
-  default_path = './default_door.json'
+  default_path = '/Users/claire/mujoco-env/lib/python3.7/site-packages/robosuite/robosuite/scripts/default_door.json'
   default_config_file = default_path
   specified_config_file = args.config_file
 
@@ -130,5 +130,5 @@ def load_defaults(args):
         if updateable_args_dict[key] is None:
           updateable_args_dict[key] = default_args.get(key)      
       else:
-        print("Argument " + key + " not defined")
+        print("Argument " + key + " not defined in default config file")
 
