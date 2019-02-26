@@ -19,17 +19,19 @@ def main():
   parser = custom_arg_parser()
   args = parser.parse_args()
   load_defaults(args)
-  print(args)
-  print(serialize_args(args))
+  print("Arguments:{}".format(args))
   # Create the model name with all the parameters
   
   model_dir_name = serialize_args(args)
+  print("Model name: {}".format(model_dir_name))
   if args.model is not None:
     model_save_path = os.path.dirname(args.model) + "/"
+    tb_save_path = model_save_path.replace("learned_models","tb_logs")
   else:
     model_save_path = "../../learned_models/" + model_dir_name + "/"
-  print("model save path:{}".format(model_save_path))
-  tb_save_path = "../../tb_logs/" +  model_dir_name + "/"
+    tb_save_path = "../../tb_logs/" +  model_dir_name + "/"
+  print("Model save path:{}".format(model_save_path))
+  print("TB logs save path:{}".format(tb_save_path))
   final_model_path = model_save_path + "final_" + model_dir_name
   model_load_path = args.model
   show_render = args.visualize
