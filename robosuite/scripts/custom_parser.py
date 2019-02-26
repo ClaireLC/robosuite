@@ -68,7 +68,7 @@ def serialize_args(args):
   if vars(args)["job_id"] is not None:
     ret += "_" + "{}".format(vars(args)["job_id"])
 
-  for key, value in vars(args).items():
+  for key, value in sorted(vars(args).items()):
     # skip config file etc. path names
     if type(value) == str:
       if '/' in value: continue
