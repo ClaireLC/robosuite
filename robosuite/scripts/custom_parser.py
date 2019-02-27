@@ -7,7 +7,7 @@ def custom_arg_parser():
   parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
   # try to load default config file
-  default_path = '/Users/claire/mujoco-env/lib/python3.7/site-packages/robosuite/robosuite/scripts/default_door.json'
+  default_path = './default_door.json'
   parser.add_argument("--config_file", help=".json file to load parameters from", default=default_path)
  
   parser.add_argument("--model", help="Directory containing a previously trained model", type=str)
@@ -105,7 +105,7 @@ def serialize_args(args):
   return ret
 
 def load_defaults(args):
-  default_path = '/Users/claire/mujoco-env/lib/python3.7/site-packages/robosuite/robosuite/scripts/default_door.json'
+  default_path = './default_door.json'
   default_config_file = default_path
   specified_config_file = args.config_file
 
