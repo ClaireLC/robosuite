@@ -22,7 +22,7 @@
   "gamma": 0.99,
   "lam": 0.95,
   "verbose": 1,
-  "total_timesteps": 1000000,
+  "total_timesteps": 5000000,
   "control_freq": 20,
   "n_cpu": 4,
   "rcoef_dist_to_handle":1,
