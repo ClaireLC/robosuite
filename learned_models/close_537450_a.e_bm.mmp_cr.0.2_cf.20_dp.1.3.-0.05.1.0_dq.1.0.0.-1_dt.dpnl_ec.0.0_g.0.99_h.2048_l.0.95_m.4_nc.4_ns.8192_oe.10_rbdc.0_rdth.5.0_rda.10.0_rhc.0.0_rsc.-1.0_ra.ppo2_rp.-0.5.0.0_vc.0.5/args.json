@@ -1,0 +1,50 @@
+{
+  "device": "keyboard",
+  "lam": 0.95,
+  "horizon": 2048,
+  "replay": false,
+  "control_freq": 20,
+  "n_steps": 8192,
+  "vf_coef": 0.5,
+  "n_cpu": 4,
+  "job_id": 537450,
+  "bot_motion": "mmp",
+  "policy": "MlpPolicy",
+  "ent_coef": 0.0,
+  "total_timesteps": 5000000,
+  "robot_pos": [
+    -0.5,
+    0,
+    0
+  ],
+  "distance": "close",
+  "model": null,
+  "opt_epochs": 10,
+  "arena": "e",
+  "door_pos": [
+    1.3,
+    -0.05,
+    1.0
+  ],
+  "door_type": "dpnl",
+  "slurm": true,
+  "rcoef_door_angle": 10.0,
+  "gamma": 0.99,
+  "stochastic_replay": false,
+  "rl_alg": "ppo2",
+  "rcoef_body_door_con": 0,
+  "rcoef_dist_to_handle": 5.0,
+  "door_quat": [
+    1,
+    0,
+    0,
+    -1
+  ],
+  "clip_range": 0.2,
+  "rcoef_self_con": -1.0,
+  "verbose": 1,
+  "config_file": "/sailhome/clairech/robosuite/robosuite/scripts/close_door.json",
+  "rcoef_handle_con": 0.0,
+  "visualize": false,
+  "minibatches": 4
+}
