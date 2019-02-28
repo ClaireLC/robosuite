@@ -40,7 +40,7 @@ def main():
   if not os.path.exists(model_save_path):
     os.makedirs(model_save_path)
     with open(model_save_path + "args.json", 'w+') as f:
-      json.dump(vars(args),f,indent=2)
+      json.dump(vars(args),f,indent=2,sort_keys=True)
 
   env = GymWrapper(
       suite.make(
