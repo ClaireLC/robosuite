@@ -3,7 +3,7 @@
   "replay": false,
   "stochastic_replay": false,
   "slurm": true,
-  "bot_motion": "static",
+  "bot_motion": "mmp",
   "arena": "e",
   "distance": "close",
   "robot_pos": [-0.5,0,0],
@@ -29,5 +29,6 @@
   "rcoef_door_angle"    :10,
   "rcoef_handle_con"    :0,
   "rcoef_body_door_con" :0,
-  "rcoef_self_con"      :0
+  "rcoef_self_con"      :0,
+  "rcoef_arm_handle_con":0
 }

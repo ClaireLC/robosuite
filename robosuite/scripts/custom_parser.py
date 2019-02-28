@@ -36,6 +36,7 @@ def custom_arg_parser():
   parser.add_argument("--rcoef_handle_con", help="EEF contact with door handle reward coefficient", type=float)
   parser.add_argument("--rcoef_body_door_con", help="Body contact with door reward coefficient", type=float)
   parser.add_argument("--rcoef_self_con", help="Self collision reward coefficient", type=float)
+  parser.add_argument("--rcoef_arm_handle_con", help="Arm links with door handle reward coefficient", type=float)
 
   # Learning parameters
   parser.add_argument("--rl_alg", help="RL algorithm to use", type=str, choices=['ppo1','ppo2'])

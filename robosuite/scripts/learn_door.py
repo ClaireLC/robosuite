@@ -59,6 +59,7 @@ def main():
       handle_con_coef     = args.rcoef_handle_con,
       body_door_con_coef  = args.rcoef_body_door_con,
       self_con_coef       = args.rcoef_self_con,
+      arm_handle_con_coef = args.rcoef_arm_handle_con,
     )
   )
   
