@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import numpy as np
+import time
 
 import robosuite.utils.transform_utils as T
 from robosuite.environments import MujocoEnv
@@ -87,7 +88,6 @@ class JR2Env(MujocoEnv):
         self._ref_joint_vel_indexes = [
             self.sim.model.get_joint_qvel_addr(x) for x in self.robot_joints
         ]
-        #print(self._ref_joint_pos_indexes)
         if self.use_indicator_object:
             ind_qpos = self.sim.model.get_joint_qpos_addr("pos_indicator")
             self._ref_indicator_pos_low, self._ref_indicator_pos_high = ind_qpos
@@ -109,9 +109,13 @@ class JR2Env(MujocoEnv):
             for actuator in self.sim.model.actuator_names
             if actuator.startswith("vel")
         ]
-        #print(self._ref_joint_vel_actuator_indexes)
     
         self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
+
+        self._ref_sensor_indexes = [
+            self.sim.model.sensor_name2id(sensor)
+            for sensor in self.sim.model.sensor_names
+        ]
 
     def move_indicator(self, pos):
         """Moves the position of the indicator object to @pos."""
@@ -131,9 +135,9 @@ class JR2Env(MujocoEnv):
 
         # Transate robot's x_vel to x and y velocities for x and y actuators
         # Get indices corresponding to x,y,theta base joints
-        rootwz_ind = self.sim.model.get_joint_qpos_addr("rootwz")
-        rootx_ind = self.sim.model.get_joint_qpos_addr("rootx")
-        rooty_ind = self.sim.model.get_joint_qpos_addr("rooty")
+        rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
+        rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
+        rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
 
         theta = self.sim.data.qpos[rootwz_ind]
         new_velx = action[rootx_ind] * np.cos(theta)
@@ -160,7 +164,7 @@ class JR2Env(MujocoEnv):
             weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
             applied_action = bias + weight * new_action
         else:
-            applied_action = new_action
+             applied_action = new_action
 
         if (self.bot_motion == "static"):
           self.sim.data.qvel[0] = 0.0
@@ -169,27 +173,16 @@ class JR2Env(MujocoEnv):
         else:
           self.sim.data.qvel[0] = weight[0] * new_velx * 0.06
           self.sim.data.qvel[1] = weight[1] * new_vely * 0.06
-    
         self.sim.data.ctrl[:] = applied_action
-        #print(applied_action)
-        #print(self.sim.data.qvel)
-        #print("{},{},{}".format(applied_action,weight[0] * new_velx,weight[1] * new_vely))
+
         # gravity compensation
         self.sim.data.qfrc_applied[
             self._ref_joint_vel_indexes
         ] = self.sim.data.qfrc_bias[self._ref_joint_vel_indexes]
 
-        #if self.use_indicator_object:
-        #    self.sim.data.qfrc_applied[
-        #        self._ref_indicator_vel_low : self._ref_indicator_vel_high
-        #    ] = self.sim.data.qfrc_bias[
-        #        self._ref_indicator_vel_low : self._ref_indicator_vel_high
-        #    ]
-
     def _post_action(self, action):
         """Optionally performs gripper visualization after the actions."""
         ret = super()._post_action(action)
-        #self._gripper_visualization()
         return ret
 
     def _get_observation(self):
@@ -221,7 +214,6 @@ class JR2Env(MujocoEnv):
         ]
 
         di["robot-state"] = np.concatenate(robot_states)
-        #print(self._ft_measurement)
         return di
 
     @property
@@ -340,11 +332,28 @@ class JR2Env(MujocoEnv):
         return self.sim.data.site_xpos[self.r_grip_site_id]
 
     @property
-    def _ft_measurement(self):
+    def _eef_force_measurement(self):
         """Returns sensor measurement."""
-        print(self.sim.model.sensor_names)
-        return self.sim.data.get_sensor("torque_ee")
-        #return self.sim.data.sensordata
+        sensor_id = self.sim.model.sensor_name2id("force_ee")
+        return self.sim.data.sensordata[sensor_id*3 : sensor_id*3 + 3]
+
+    @property
+    def _eef_torque_measurement(self):
+        """Returns sensor measurement."""
+        sensor_id = self.sim.model.sensor_name2id("torque_ee")
+        return self.sim.data.sensordata[sensor_id*3 : sensor_id*3 + 3]
+
+    @property
+    def _l2_force_measurement(self):
+        """Returns sensor measurement."""
+        sensor_id = self.sim.model.sensor_name2id("force_2")
+        return self.sim.data.sensordata[sensor_id*3 : sensor_id*3 + 3]
+
+    @property
+    def _l3_force_measurement(self):
+        """Returns sensor measurement."""
+        sensor_id = self.sim.model.sensor_name2id("force_3")
+        return self.sim.data.sensordata[sensor_id*3 : sensor_id*3 + 3]
 
     def _gripper_visualization(self):
         """

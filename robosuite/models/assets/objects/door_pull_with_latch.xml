@@ -45,9 +45,9 @@
                     <geom size="0.05 0.15" quat="0.707388 0.706825 0 0" type="cylinder" material="MatFoil" class="viz" />
                     <geom size="0.02 0.1" pos="0.1 -0.15 0" quat="0.707388 0 0.706825 0" type="capsule" material="MatFoil" class="viz"/>
                     <geom size="0.04 0.07" pos="-0.1 0.1 0" quat="0.707388 0 0.706825 0" type="capsule" material="MatFoil" class="viz"/>
-                    <geom size="0.05 0.15" quat="0.707388 0.706825 0 0" type="cylinder" class="coll" name="latch_g0"/>
-                    <geom size="0.02 0.1" pos="0.1 -0.15 0" quat="0.707388 0 0.706825 0" type="capsule" class="coll" name="latch_g1"/>
-                    <geom size="0.04 0.07" pos="-0.1 0.1 0" quat="0.707388 0 0.706825 0" type="capsule" class="coll" name="latch_g2"/>
+                    <geom size="0.05 0.15" quat="0.707388 0.706825 0 0" type="cylinder" class="coll" name="handle_base"/>
+                    <geom size="0.02 0.1" pos="0.1 -0.15 0" quat="0.707388 0 0.706825 0" type="capsule" class="coll" name="handle"/>
+                    <geom size="0.04 0.07" pos="-0.1 0.1 0" quat="0.707388 0 0.706825 0" type="capsule" class="coll" name="latch"/>
                     <site name="door_handle" pos="0.15 -0.15 0" size="0.025" class="site" rgba="1 0 0 1"/>
                 </body>
             </body>

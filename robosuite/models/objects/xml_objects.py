@@ -133,7 +133,8 @@ class DoorPullNoLatchObject(MujocoXMLObject):
   @property
   def handle_contact_geoms(self):
       return[
-        "latch_g1",
+        "handle_base",
+        "handle",
       ]
 
   @property
@@ -158,7 +159,8 @@ class DoorPullWithLatchObject(MujocoXMLObject):
   @property
   def handle_contact_geoms(self):
       return[
-        "latch_g1",
+        "handle_base",
+        "handle",
       ]
 
   @property

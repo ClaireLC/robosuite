@@ -31,6 +31,7 @@ class JR2Door(JR2Env):
         handle_con_coef=1.0,
         body_door_con_coef=0.0,
         self_con_coef=0.0,
+        arm_handle_con_coef=0.0,
         **kwargs
     ):
         """
@@ -86,6 +87,7 @@ class JR2Door(JR2Env):
         self.handle_con_coef = handle_con_coef
         self.body_door_con_coef = body_door_con_coef
         self.self_con_coef = self_con_coef
+        self.arm_handle_con_coef = arm_handle_con_coef
 
         super().__init__(
             **kwargs
@@ -162,6 +164,12 @@ class JR2Door(JR2Env):
         body_door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms + self.mujoco_objects["Door"].handle_contact_geoms)
         body_door_con_num = len(list(body_door_con))
   
+
+        # Arm links to door handle contacts 
+        arm_handle_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms, self.mujoco_objects["Door"].handle_contact_geoms)
+        arm_handle_con_num = len(list(arm_handle_con))
+        #print(arm_handle_con_num)
+  
         #print("handle xpos: {}".format(self._door_handle_xpos))
         
         rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
@@ -169,10 +177,14 @@ class JR2Door(JR2Env):
         rew_handle_con     = self.handle_con_coef * door_handle_con_num
         rew_body_door_con  = self.body_door_con_coef * body_door_con_num
         rew_self_con       = self.self_con_coef * self_con_num
+        rew_arm_handle_con = self.arm_handle_con_coef * arm_handle_con_num
+        #print(self.arm_handle_con_coef)
 
         reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con
 
-        print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con): ({},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con))
+        #print("EEF force: {}".format(self._eef_force_measurement))
+        #print("EEF torque: {}".format(self._eef_torque_measurement))
+        #print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con): ({},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con))
 
         return reward
     
