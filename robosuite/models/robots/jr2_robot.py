@@ -39,6 +39,7 @@ class JR2(Robot):
     @property
     def init_qpos(self):
         pos = np.array([ 3.71955388e-01, -4.32114760e-02, -5.92153450e-02, -1.71517591e+00,2.83001900e+00,3.37765872e+00,1.71800951e+00,1.87382209e-02,-1.78553740e-03])
+        #pos = np.array([ 3.70740471e-01,-4.31945130e-02,-5.92161524e-02,-1.71636826e+00,2.48744571e+00,4.35466325e+00,1.68285118e+00,4.26563177e-02,-1.51617785e-03])
         return pos
     
     @property
@@ -65,9 +66,6 @@ class JR2(Robot):
           "armlink_3",  
           "armlink_5",  
           "armlink_6",  
-          "fingerlink_2",
-          "fingertip_2",
-          "fingertip_2_hook",
         ]
 
     @property
