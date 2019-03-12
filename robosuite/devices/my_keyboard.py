@@ -21,8 +21,19 @@ class MyKeyboard(Device):
 
         self._reset_state = 0
         self._enabled = False
-        self._vel_step = 0.05
-
+        self._vel_step = 0.01
+    
+        self.state = {
+                      1: 0.0,
+                      2: 0.0,  
+                      #3: 0.0,  
+                      #4: 0.0,  
+                      #5: 0.0,  
+                      #6: 0.0,  
+                      #7: 0.0,  
+                      #8: 0.0,  
+                      }
+  
     def _display_controls(self):
         """
         Method to pretty print controls.
@@ -51,10 +62,16 @@ class MyKeyboard(Device):
         """
         Resets internal state of controller, except for the reset signal.
         """
-        self.vel = 0.0
-        self.last_vel = 0.0
-        self.joint = 1
-        self.last_joint = 1
+        self.state = {
+                      1: 0.0,
+                      2: 0.0,  
+                      #3: 0.0,  
+                      #4: 0.0,  
+                      #5: 0.0,  
+                      #6: 0.0,  
+                      #7: 0.0,  
+                      #8: 0.0,  
+                      }
 
     def start_control(self):
         """
@@ -67,25 +84,20 @@ class MyKeyboard(Device):
 
     def get_controller_state(self):
         """Returns the current state of the keyboard, a dictionary of pos, orn, grasp, and reset."""
-        
-#        print(self.pos)
-        return dict(
-          vel=self.vel,
-          joint_num=self.joint,
-        )
+        return self.state
 
     def on_press(self, window, key, scancode, action, mods):
         """
         Key handler for key presses.
         """
         if key == glfw.KEY_W:
-          self.vel += self._vel_step
+          self.state[self.joint] += self._vel_step
         elif key == glfw.KEY_S:
-          self.vel -= self._vel_step
+          self.state[self.joint] -= self._vel_step
         elif key == glfw.KEY_R:
-          self.vel  = 0.0
+          self.state[self.joint]  = 0.0
   
-        elif key == glfw.KEY_1:
+        if key == glfw.KEY_1:
           self.joint  = 1
         elif key == glfw.KEY_2:
           self.joint  = 2

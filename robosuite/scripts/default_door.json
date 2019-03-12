@@ -30,5 +30,6 @@
   "rcoef_handle_con"    :0,
   "rcoef_body_door_con" :0,
   "rcoef_self_con"      :0,
-  "rcoef_arm_handle_con":0
+  "rcoef_arm_handle_con":0,
+  "rcoef_arm_door_con"  :0
 }

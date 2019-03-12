@@ -16,6 +16,7 @@ from .xml_objects import (
     PlateWithHoleObject,
     DoorPullNoLatchObject,
     DoorPullWithLatchObject,
+    DoorPullNoLatchRoomObject,
 )
 
 from .generated_objects import (

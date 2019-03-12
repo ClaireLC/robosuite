@@ -172,3 +172,37 @@ class DoorPullWithLatchObject(MujocoXMLObject):
         "l_frame",
         "r_frame",
       ]
+
+class DoorPullNoLatchRoomObject(MujocoXMLObject):
+  """
+  Door: pull with latch with walls
+  """
+
+  def __init__(self):
+        super().__init__(xml_path_completion("objects/door_pull_no_latch_room.xml"))  
+
+  @property
+  def handle_contact_geoms(self):
+      return[
+        "handle_base",
+        "handle",
+      ]
+
+  @property
+  def door_contact_geoms(self):
+      return[
+        "door_box",
+        "door_r_cyl",
+        "door_l_cyl",
+        "l_frame",
+        "r_frame",
+      ]
+
+  @property
+  def wall_contact_geoms(self):
+      return[
+        "wall_g0",
+        "wall_g1",
+        "wall_g2",
+        "wall_g3",
+      ]

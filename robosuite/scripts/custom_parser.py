@@ -22,7 +22,7 @@ def custom_arg_parser():
 
   # Environment parameters
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
-  parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl'])
+  parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl','dpnlr'])
   parser.add_argument("--arena", help="Arena type, either empty or room", type=str, choices=['e','r'])
   parser.add_argument("--distance", help="Distance from robot to door", type=str)
   parser.add_argument("--robot_pos", help="Position of door [x,y,z]", nargs='+', type=float)
@@ -37,6 +37,7 @@ def custom_arg_parser():
   parser.add_argument("--rcoef_body_door_con", help="Body contact with door reward coefficient", type=float)
   parser.add_argument("--rcoef_self_con", help="Self collision reward coefficient", type=float)
   parser.add_argument("--rcoef_arm_handle_con", help="Arm links with door handle reward coefficient", type=float)
+  parser.add_argument("--rcoef_arm_door_con", help="Arm links with door reward coefficient", type=float)
 
   # Learning parameters
   parser.add_argument("--rl_alg", help="RL algorithm to use", type=str, choices=['ppo1','ppo2'])

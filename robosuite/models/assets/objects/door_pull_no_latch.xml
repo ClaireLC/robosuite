@@ -32,7 +32,7 @@
             <geom size="0.05 1." pos="0.0 0 0" type="cylinder" rgba="1 0 0 1" class="coll" name="l_frame"/>
             <body name="door" pos="0.45 0 0">
                 <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="0.1" diaginertia="0.0913751 0.0521615 0.043714" />
-                <joint name="door_hinge" pos="0.45 0 0" axis="0 0 1" range="0.0 1.57" damping="0.001" frictionloss=".001" limited="true"/>
+                <joint name="door_hinge" pos="0.45 0 0" axis="0 0 1" range="0.0 2.0" damping="0.001" frictionloss=".001" limited="true"/>
                 <geom size="0.35 0.05 .99" type="box" friction="1 1 1" material="MatWood" class="viz"/>
                 <geom size="0.05      .99" pos="0.35 0 0" type="cylinder" material="MatWood" class="viz" />
                 <geom size="0.05      .99" pos="-0.35 0 0" type="cylinder" material="MatWood" class="viz" />

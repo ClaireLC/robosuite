@@ -60,6 +60,7 @@ def main():
       body_door_con_coef  = args.rcoef_body_door_con,
       self_con_coef       = args.rcoef_self_con,
       arm_handle_con_coef = args.rcoef_arm_handle_con,
+      arm_door_con_coef   = args.rcoef_arm_door_con
     )
   )
   
@@ -111,11 +112,12 @@ def main():
         print("Error: No model has been specified")
     
       action, _states = model.predict(obs)
+      print("action {}".format(action))
       obs, reward, done, info = env.step(action)
       env.render()
       #print(obs)
       #print(env.sim.data.qpos[env._ref_joint_vel_indexes])
-      #time.sleep(0.1)
+      #time.sleep(0.05)
   else:
     # Train
     model.learn(

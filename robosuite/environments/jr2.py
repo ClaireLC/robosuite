@@ -10,7 +10,7 @@ from robosuite.models.robots import JR2
 
 
 class JR2Env(MujocoEnv):
-    """Initializes a Baxter robot environment."""
+    """Initializes a JR robot environment."""
 
     def __init__(
         self,
@@ -71,9 +71,7 @@ class JR2Env(MujocoEnv):
         """Resets the pose of the arm and grippers."""
         print("RESET")
         super()._reset_internal()
-        #print(self.sim.data.qpos)
         self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos
-        #print("data\n {}".format(self.sim.data.qpos))
 
     def _get_reference(self):
         """Sets up references for robots, grippers, and objects."""
@@ -109,6 +107,9 @@ class JR2Env(MujocoEnv):
             for actuator in self.sim.model.actuator_names
             if actuator.startswith("vel")
         ]
+        self._rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
+        self._rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
+        self._rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
     
         self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
 
@@ -116,6 +117,8 @@ class JR2Env(MujocoEnv):
             self.sim.model.sensor_name2id(sensor)
             for sensor in self.sim.model.sensor_names
         ]
+
+        self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
 
     def move_indicator(self, pos):
         """Moves the position of the indicator object to @pos."""
@@ -126,32 +129,27 @@ class JR2Env(MujocoEnv):
 
     # Note: Overrides super
     def _pre_action(self, action):
-        #print("Action: {}".format(action))
+        velx_w = self.sim.data.qvel[self._rootx_ind]
+        vely_w = self.sim.data.qvel[self._rooty_ind]
+        velx_robot = velx_w * np.cos(self.theta_w) + vely_w * np.sin(self.theta_w)
+        vely_robot = - velx_w * np.sin(self.theta_w) + vely_w * np.cos(self.theta_w)
+
         #print("ncon: {}".format(self.sim.data.ncon))
         
         # action is an 8-dim vector (x,theta,arm joint velocities)
         # Copy the action to a list
         new_action = action.copy().tolist()
 
+        print("\npolicy action {}".format(new_action))
         # Transate robot's x_vel to x and y velocities for x and y actuators
-        # Get indices corresponding to x,y,theta base joints
-        rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
-        rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
-        rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
-
-        theta = self.sim.data.qpos[rootwz_ind]
-        new_velx = action[rootx_ind] * np.cos(theta)
-        new_vely = action[rootx_ind] * np.sin(theta)
+        new_velx = action[self._rootx_ind] * np.cos(self.theta_w)
+        new_vely = action[self._rootx_ind] * np.sin(self.theta_w)
   
         # Update x velocity in new_action
-        new_action[rootx_ind] = new_velx
-        # Insert h velocity into new_action
-        new_action.insert(1,new_vely)
+        new_action[self._rootx_ind] = new_velx
+        # Insert y velocity into new_action
+        new_action.insert(self._rooty_ind,new_vely)
 
-        # Set x,y velocity commands to 0, to solve the problem of sliding base
-        new_action[0] = 0.0
-        new_action[1] = 0.0
-        
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
         # for certain controllers. They later get normalized to the control range.
         if self.rescale_actions:
@@ -164,15 +162,42 @@ class JR2Env(MujocoEnv):
             weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
             applied_action = bias + weight * new_action
         else:
-             applied_action = new_action
+            applied_action = new_action
+
+        print("theta: {}".format(self.theta_w))
+        print("robot x vel:{}".format(velx_robot))
+        print("robot y vel:{}".format(vely_robot))
+        print("world x vel:{}".format(velx_w))
+        print("world y vel:{}".format(vely_w))
+        print("world wz vel:{}".format(self.sim.data.qvel[self._rootwz_ind]))
 
         if (self.bot_motion == "static"):
           self.sim.data.qvel[0] = 0.0
           self.sim.data.qvel[1] = 0.0
           self.sim.data.qvel[2] = 0.0
         else:
-          self.sim.data.qvel[0] = weight[0] * new_velx * 0.06
-          self.sim.data.qvel[1] = weight[1] * new_vely * 0.06
+          action_scale = 0.05
+          new_velx = weight[self._rootx_ind] * applied_action[self._rootx_ind] * action_scale
+          new_vely = weight[self._rooty_ind] * applied_action[self._rooty_ind] * action_scale
+          new_veltheta = weight[self._rootwz_ind] * applied_action[self._rootwz_ind] * action_scale
+          self.sim.data.qvel[self._rootx_ind] = new_velx
+          self.sim.data.qvel[self._rooty_ind] = new_vely
+          self.sim.data.qvel[self._rootwz_ind] = new_veltheta
+          #print("robot y vel:{}".format(vely_robot))
+          if (abs(vely_robot) > 0.0005):
+            print("SLIPPING robot y vel:{}".format(vely_robot))
+            self.sim.data.qpos[self._rooty_ind] = self.prev_base_y_pos
+          else:
+            self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
+
+        # Set x,y velocity commands to 0, to solve the problem of sliding base
+        applied_action[self._rootx_ind] = 0.0
+        applied_action[self._rooty_ind] = 0.0
+        applied_action[self._rootwz_ind] = 0.0
+
+        print("applied action {}".format(applied_action))
+        #print("set qvels {},{},{}".format(new_velx,new_vely,new_veltheta))
+        print("actual qvels {}".format(self.sim.data.qvel[self._ref_joint_vel_indexes]))
         self.sim.data.ctrl[:] = applied_action
 
         # gravity compensation
@@ -204,16 +229,23 @@ class JR2Env(MujocoEnv):
             [self.sim.data.qvel[x] for x in self._ref_joint_vel_indexes]
         )
         di["r_eef_xpos"] = self._r_eef_xpos
+        di["r_eef_xquat"] = self._r_eef_xquat
+        di["robot_base_pos"] = self.robot_base_pos
+        di["robot_base_theta"] = self.robot_base_theta
   
         robot_states = [
-            #np.sin(di["joint_pos"]),
-            #np.cos(di["joint_pos"]),
             di["joint_pos"],
             di["joint_vel"],
             di["r_eef_xpos"],
+            di["robot_base_pos"],
         ]
-
+  
         di["robot-state"] = np.concatenate(robot_states)
+        
+        #print("robot pose {}".format(self.robot_pose_in_world))
+        print("robot state obs {}".format(di))
+  
+        print("eef force/torque {}/{}".format(self._eef_force_measurement,self._eef_torque_measurement))
         return di
 
     @property
@@ -221,6 +253,41 @@ class JR2Env(MujocoEnv):
         """Returns the DoF of the robot (with grippers)."""
         dof = self.mujoco_robot.dof
         return dof
+
+    @property
+    def theta_w(self):
+        """Returns theta of robot in world frame"""
+        theta = self.sim.data.qpos[self._rootwz_ind]
+        return theta
+
+    @property
+    def robot_pose_in_world(self):
+        pos_in_world = self.sim.data.get_body_xpos("base_footprint")
+        rot_in_world = self.sim.data.get_body_xmat("base_footprint").reshape((3, 3))
+        pose_in_world = T.make_pose(pos_in_world, rot_in_world)
+        return pose_in_world
+
+    @property
+    def robot_base_pos(self):
+        """
+        Base position of robot in world frame
+        """
+        return self.robot_pose_in_world.flatten()[[3,7]]
+
+    @property
+    def robot_base_theta(self):
+        """
+        Base angle of robot in world frame (around z axis)
+        """
+        abs_theta = np.arccos(self.robot_pose_in_world.flatten()[0])
+        # determine quadrant of angle
+        sin_sign = np.sign(self.robot_pose_in_world[1][0])
+        
+        if sin_sign != 0:
+          return abs_theta * sin_sign
+        else:
+          return abs_theta
+            
 
     def pose_in_base_from_name(self, name):
         """
@@ -328,8 +395,13 @@ class JR2Env(MujocoEnv):
 
     @property
     def _r_eef_xpos(self):
-        """Returns the position of the right hand in world frame."""
+        """Returns the position of the right hand site in world frame."""
         return self.sim.data.site_xpos[self.r_grip_site_id]
+
+    @property
+    def _r_eef_xquat(self):
+        """Returns the position of the right hand site in world frame."""
+        return T.mat2quat(self.sim.data.site_xmat[self.r_grip_site_id].reshape((3,3)))
 
     @property
     def _eef_force_measurement(self):

@@ -5,7 +5,7 @@ import robosuite.utils.transform_utils as T
 from robosuite.environments.baxter import BaxterEnv
 from robosuite.environments.jr2 import JR2Env
 
-from robosuite.models.objects import DoorPullNoLatchObject, DoorPullWithLatchObject
+from robosuite.models.objects import DoorPullNoLatchObject, DoorPullWithLatchObject, DoorPullNoLatchRoomObject
 from robosuite.models.arenas import TableArena, EmptyArena
 from robosuite.models.robots import Baxter
 from robosuite.models.tasks import DoorTask
@@ -32,6 +32,7 @@ class JR2Door(JR2Env):
         body_door_con_coef=0.0,
         self_con_coef=0.0,
         arm_handle_con_coef=0.0,
+        arm_door_con_coef=0.0,
         **kwargs
     ):
         """
@@ -69,6 +70,9 @@ class JR2Door(JR2Env):
          self.door = DoorPullNoLatchObject()
         elif (door_type == "dpwl"):
          self.door = DoorPullWithLatchObject()
+        elif (door_type == "dpnlr"):
+         print("door type room")
+         self.door = DoorPullNoLatchRoomObject()
 
         self.mujoco_objects = OrderedDict([("Door", self.door)])
 
@@ -88,6 +92,7 @@ class JR2Door(JR2Env):
         self.body_door_con_coef = body_door_con_coef
         self.self_con_coef = self_con_coef
         self.arm_handle_con_coef = arm_handle_con_coef
+        self.arm_door_con_coef  = arm_door_con_coef
 
         super().__init__(
             **kwargs
@@ -147,44 +152,61 @@ class JR2Door(JR2Env):
         #print("distance to door: {}".format(distance_to_handle))
         #print("R: distance to door: {}".format(distance_to_handle))
 
-        # Angle of door body (in door object frame?)
+        # Angle of door body (in door object frame)
         door_hinge_angle = self._door_hinge_pos
 
         # Penalize self contacts (arm with body)
         self_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms,self.mujoco_robot.body_contact_geoms) 
-        self_con_num = len(list(self_con))
+        self_con_num = len(list(self_con)) > 0
         #print(self_con_num)
 
         # Contact with door handle
         door_handle_con = self.find_contacts(self.mujoco_robot.gripper_contact_geoms,self.mujoco_objects["Door"].handle_contact_geoms)
-        door_handle_con_num = len(list(door_handle_con))
-        #print(door_handle_con_num)
+        door_handle_con_num = len(list(door_handle_con)) > 0
+        #print("eef handle con num {}".format(door_handle_con_num))
       
         # Body to door contacts
         body_door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms + self.mujoco_objects["Door"].handle_contact_geoms)
-        body_door_con_num = len(list(body_door_con))
+        body_door_con_num = len(list(body_door_con)) > 0
+        #print("body door con num {}".format(body_door_con_num))
   
+        # Arm to door contacts
+        arm_door_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms + self.mujoco_robot.gripper_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms)
+        arm_door_con_num = len(list(arm_door_con)) > 0
+        #print("arm door con num {}".format(arm_door_con_num))
 
         # Arm links to door handle contacts 
         arm_handle_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms, self.mujoco_objects["Door"].handle_contact_geoms)
-        arm_handle_con_num = len(list(arm_handle_con))
+        arm_handle_con_num = len(list(arm_handle_con)) > 0
         #print(arm_handle_con_num)
+
+        # Penalize large forces
+        if ((abs(self._eef_force_measurement) > 60).any()):
+          rew_eef_force = -100
+          print("LARGE FORCE")
+        else:
+          rew_eef_force = 0
   
         #print("handle xpos: {}".format(self._door_handle_xpos))
+
+        # Reward for going through door
+        #base_target_pos_x = self.door_pos[0] + 2
+        #base_to_target_dist = self._joint_positions[0] - base_target_pos_x
+        #rew_base_to_targ = 1 - base_to_target_dist
         
-        rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
+        rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(5*distance_to_handle))
         rew_door_angle     = self.door_angle_coef * door_hinge_angle
         rew_handle_con     = self.handle_con_coef * door_handle_con_num
         rew_body_door_con  = self.body_door_con_coef * body_door_con_num
         rew_self_con       = self.self_con_coef * self_con_num
         rew_arm_handle_con = self.arm_handle_con_coef * arm_handle_con_num
+        rew_arm_door_con   = self.arm_door_con_coef * arm_door_con_num
         #print(self.arm_handle_con_coef)
 
-        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con
+        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con
 
-        #print("EEF force: {}".format(self._eef_force_measurement))
-        #print("EEF torque: {}".format(self._eef_torque_measurement))
-        #print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con): ({},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con))
+        print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con))
+        print("total reward: {}".format(reward))
 
         return reward
     
@@ -249,7 +271,7 @@ class JR2Door(JR2Env):
           di["door_pos"] = door_pos
           di["door_quat"] = door_quat
           di["door_handle_pos"] = self._door_handle_xpos 
-          di["eef_to_handle"] = self._door_handle_xpos - self._r_eef_xpos 
+          #di["eef_to_handle"] = self._door_handle_xpos - self._r_eef_xpos 
           di["handle_quat"] =  self._door_latch_xquat
           #print(di["handle_quat"])
     
@@ -258,11 +280,12 @@ class JR2Door(JR2Env):
               di["door_pos"],
               di["door_quat"],
               di["door_handle_pos"],
-              di["eef_to_handle"],
+              #di["eef_to_handle"],
               di["handle_quat"],
             ]
           )
  
+        #print("object state obs {}".format(di))
         return di
 
     def _check_contact(self):

@@ -9,7 +9,6 @@ import robosuite as suite
 def test_all_environments():
 
     envs = sorted(suite.environments.ALL_ENVS)
-
     for env_name in envs:
 
         # create an environment for learning on pixels
