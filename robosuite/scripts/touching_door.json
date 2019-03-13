@@ -31,5 +31,6 @@
   "rcoef_body_door_con" :-1,
   "rcoef_self_con"      :-1,
   "rcoef_arm_handle_con":-1,
-  "rcoef_arm_door_con"  :-1
+  "rcoef_arm_door_con"  :-3,
+  "rcoef_force"         :-100
 }

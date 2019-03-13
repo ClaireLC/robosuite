@@ -33,6 +33,7 @@ class JR2Door(JR2Env):
         self_con_coef=0.0,
         arm_handle_con_coef=0.0,
         arm_door_con_coef=0.0,
+        force_coef=0.0,
         **kwargs
     ):
         """
@@ -93,6 +94,7 @@ class JR2Door(JR2Env):
         self.self_con_coef = self_con_coef
         self.arm_handle_con_coef = arm_handle_con_coef
         self.arm_door_con_coef  = arm_door_con_coef
+        self.force_coef = force_coef
 
         super().__init__(
             **kwargs
@@ -181,8 +183,9 @@ class JR2Door(JR2Env):
         #print(arm_handle_con_num)
 
         # Penalize large forces
+        print("rew {}".format(self.force_coef))
         if ((abs(self._eef_force_measurement) > 60).any()):
-          rew_eef_force = -100
+          rew_eef_force = self.force_coef
           print("LARGE FORCE")
         else:
           rew_eef_force = 0
