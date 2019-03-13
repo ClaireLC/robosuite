@@ -71,7 +71,6 @@ class JR2Door(JR2Env):
         elif (door_type == "dpwl"):
          self.door = DoorPullWithLatchObject()
         elif (door_type == "dpnlr"):
-         print("door type room")
          self.door = DoorPullNoLatchRoomObject()
 
         self.mujoco_objects = OrderedDict([("Door", self.door)])
@@ -183,7 +182,7 @@ class JR2Door(JR2Env):
         # Penalize large forces
         if ((abs(self._eef_force_measurement) > 60).any()):
           rew_eef_force = -100
-          print("LARGE FORCE")
+          #print("LARGE FORCE")
         else:
           rew_eef_force = 0
   
@@ -205,8 +204,8 @@ class JR2Door(JR2Env):
 
         reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con
 
-        print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con))
-        print("total reward: {}".format(reward))
+        #print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con))
+        #print("total reward: {}".format(reward))
 
         return reward
     
