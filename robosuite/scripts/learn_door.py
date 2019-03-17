@@ -62,6 +62,9 @@ def main():
       arm_handle_con_coef = args.rcoef_arm_handle_con,
       arm_door_con_coef   = args.rcoef_arm_door_con,
       force_coef          = args.rcoef_force,
+      reset_on_large_force= args.reset_on_large_force,
+      debug_print         = args.print_info,
+      init_distance       = args.distance,
     )
   )
   
@@ -113,12 +116,12 @@ def main():
         print("Error: No model has been specified")
     
       action, _states = model.predict(obs)
-      print("action {}".format(action))
+      #print("action {}".format(action))
       obs, reward, done, info = env.step(action)
       env.render()
       #print(obs)
       #print(env.sim.data.qpos[env._ref_joint_vel_indexes])
-      #time.sleep(0.05)
+      #time.sleep(0.1)
   else:
     # Train
     model.learn(

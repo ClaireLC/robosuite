@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import numpy as np
+import time
 
 import robosuite.utils.transform_utils as T
 from robosuite.environments.baxter import BaxterEnv
@@ -34,6 +35,7 @@ class JR2Door(JR2Env):
         arm_handle_con_coef=0.0,
         arm_door_con_coef=0.0,
         force_coef=0.0,
+        debug_print=False,
         **kwargs
     ):
         """
@@ -62,6 +64,8 @@ class JR2Door(JR2Env):
             body_door_con_coef: reward coefficent to penalize body contact with door
 
             self_con_coef: reward coefficient to penalize self collisions
+      
+            debug_print: True if printing debug information
 
         Inherits the JR2 environment; refer to other parameters described there.
         """
@@ -94,6 +98,9 @@ class JR2Door(JR2Env):
         self.arm_handle_con_coef = arm_handle_con_coef
         self.arm_door_con_coef  = arm_door_con_coef
         self.force_coef = force_coef
+
+        self.debug_print = debug_print
+        print('debug print {}'.format(self.debug_print))
 
         super().__init__(
             **kwargs
@@ -184,7 +191,10 @@ class JR2Door(JR2Env):
         # Penalize large forces
         if ((abs(self._eef_force_measurement) > 60).any()):
           rew_eef_force = self.force_coef
-          print("LARGE FORCE")
+          if self.debug_print:
+            print("LARGE FORCE {}".format(self._eef_force_measurement))
+            time.sleep(1)
+          self.large_force = True
         else:
           rew_eef_force = 0
   
@@ -206,8 +216,9 @@ class JR2Door(JR2Env):
 
         reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con
 
-        #print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con))
-        #print("total reward: {}".format(reward))
+        if self.debug_print:
+          print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con))
+          print("total reward: {}".format(reward))
 
         return reward
     

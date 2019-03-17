@@ -21,6 +21,7 @@ def custom_arg_parser():
   parser.add_argument("--device", type=str, default="keyboard")
 
   # Environment parameters
+  parser.add_argument("--print_info", help="Specifies whether or not debug information is printed",type=str2bool)
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
   parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl','dpnlr'])
   parser.add_argument("--arena", help="Arena type, either empty or room", type=str, choices=['e','r'])
@@ -29,6 +30,7 @@ def custom_arg_parser():
   parser.add_argument("--door_pos", help="Position of door [x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_quat", help="Position of door [w,x,y,z]", nargs='+', type=float)
   parser.add_argument("--control_freq", help="Control frequency", type=int)
+  parser.add_argument("--reset_on_large_force", help="Specifies if environment should reset when robot eef exerts large force", type=str2bool)
 
   # Reward coefficients
   parser.add_argument("--rcoef_dist_to_handle", help="EEF distance to door handle reward coefficient", type=float)
