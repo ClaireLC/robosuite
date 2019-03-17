@@ -36,9 +36,9 @@
 <worldbody>
 <body name="base_footprint">
         <!--<joint name="root" type="free" pos="0 0 0" damping="20"/>-->
-        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="100" frictionloss="2"/>
-        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="100" frictionloss="2"/>
-        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="100" frictionloss="2"/>
+        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="200" frictionloss="2"/>
+        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="200" frictionloss="2"/>
+        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="200" frictionloss="2"/>
         <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
         <body name="base_link" pos="0 0 0">
             <body name="base_chassis_link" pos="0 0 0.160568">
@@ -171,7 +171,7 @@
                         <inertial pos="0 0 0.1255" mass="0.46784" diaginertia="0.1 0.1 0.1" />
                         <!--<inertial pos="0 0 0.1255" mass="0.46784" diaginertia="0.000951271 0.000951271 0.000374272" /> -->
                         <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="base" class="viz"/>
-                        <geom type="cylinder" pos="0 0 0.12" size="0.04 0.1" class="coll" name="armlink_base"/>
+                        <geom type="cylinder" pos="0 0 0.12" size="0.04 0.09" class="coll" name="armlink_base"/>
                         <body name="m1n6s200_link_1" pos="0 0 0.15675" quat="0 0 1 0">
                             <inertial pos="0 -0.002 -0.0605" mass="0.7477" diaginertia="0.1 0.1 0.1" />
                             <!--<inertial pos="0 -0.002 -0.0605" mass="0.7477" diaginertia="0.00152032 0.00152032 0.00059816" /> -->
@@ -183,7 +183,7 @@
                                 <joint name="m1n6s200_joint_2" pos="0 0 0" axis="0 0 1" limited="true" range="0.872665 5.41052" />
                                 <site name="ft_2" pos="0.0 0.0 0.0" size="0.01" rgba="0 1 0 1" type="sphere" class="site"/>
                                 <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="arm_mico" class="viz"/>
-                                <geom type="box" pos="0 -0.14 -0.03" size="0.04 0.15 0.01" quat="1 0 0 0" class="coll" name="armlink_2"/>
+                                <geom type="box" pos="0 -0.14 -0.03" size="0.03 0.15 0.01" quat="1 0 0 0" class="coll" name="armlink_2"/>
                                 <body name="m1n6s200_link_3" pos="0 -0.29 0" quat="0 0 1 0">
                                     <inertial pos="0 0.0463 -0.0065" quat="0.707107 0.707107 0 0" mass="0.606" diaginertia="0.1 0.1 0.1" />
                                     <!--<inertial pos="0 0.0463 -0.0065" quat="0.707107 0.707107 0 0" mass="0.606" diaginertia="0.000383798 0.000383798 0.0001212" />-->
