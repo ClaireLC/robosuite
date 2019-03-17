@@ -17,6 +17,8 @@ class JR2Env(MujocoEnv):
         use_indicator_object=False,
         rescale_actions=True,
         bot_motion="mmp",
+        reset_on_large_force=False,
+        init_distance=None,
         **kwargs
     ):
         """
@@ -56,10 +58,17 @@ class JR2Env(MujocoEnv):
             camera_width (int): width of camera frame.
 
             camera_depth (bool): True if rendering RGB-D, and RGB otherwise.
+
+            reset_on_large_force (bool): False if environment should not reset when eef applies large force
+      
+            init_distance (str): Intial qpos specifier for robot
         """
         self.use_indicator_object = use_indicator_object
         self.rescale_actions = rescale_actions
         self.bot_motion = bot_motion
+        self.large_force = False
+        self.reset_on_large_force = reset_on_large_force
+        self.init_distance = init_distance
         super().__init__(**kwargs)
 
     def _load_model(self):
@@ -69,9 +78,12 @@ class JR2Env(MujocoEnv):
 
     def _reset_internal(self):
         """Resets the pose of the arm and grippers."""
-        print("RESET")
+        if self.debug_print:
+          print("\nRESETTING ENVIRONMENT")
+
         super()._reset_internal()
-        self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos
+        self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos(self.init_distance)
+        self.large_force = False
 
     def _get_reference(self):
         """Sets up references for robots, grippers, and objects."""
@@ -140,7 +152,10 @@ class JR2Env(MujocoEnv):
         # Copy the action to a list
         new_action = action.copy().tolist()
 
-        print("\npolicy action {}".format(new_action))
+        if self.debug_print:
+          print("Robot pre_action info")
+          print("Policy action {}".format(new_action))
+
         # Transate robot's x_vel to x and y velocities for x and y actuators
         new_velx = action[self._rootx_ind] * np.cos(self.theta_w)
         new_vely = action[self._rootx_ind] * np.sin(self.theta_w)
@@ -164,12 +179,13 @@ class JR2Env(MujocoEnv):
         else:
             applied_action = new_action
 
-        print("theta: {}".format(self.theta_w))
-        print("robot x vel:{}".format(velx_robot))
-        print("robot y vel:{}".format(vely_robot))
-        print("world x vel:{}".format(velx_w))
-        print("world y vel:{}".format(vely_w))
-        print("world wz vel:{}".format(self.sim.data.qvel[self._rootwz_ind]))
+        if self.debug_print:
+          print("theta: {}".format(self.theta_w))
+          print("robot x vel:{}".format(velx_robot))
+          print("robot y vel:{}".format(vely_robot))
+          print("world x vel:{}".format(velx_w))
+          print("world y vel:{}".format(vely_w))
+          #print("world wz vel:{}".format(self.sim.data.qvel[self._rootwz_ind]))
 
         if (self.bot_motion == "static"):
           self.sim.data.qvel[0] = 0.0
@@ -184,8 +200,9 @@ class JR2Env(MujocoEnv):
           self.sim.data.qvel[self._rooty_ind] = new_vely
           self.sim.data.qvel[self._rootwz_ind] = new_veltheta
           #print("robot y vel:{}".format(vely_robot))
-          if (abs(vely_robot) > 0.0005):
-            print("SLIPPING robot y vel:{}".format(vely_robot))
+          if (abs(vely_robot) > 0.001):
+            if self.debug_print:
+              print("SLIPPING robot y vel:{}".format(vely_robot))
             self.sim.data.qpos[self._rooty_ind] = self.prev_base_y_pos
           else:
             self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
@@ -195,9 +212,9 @@ class JR2Env(MujocoEnv):
         applied_action[self._rooty_ind] = 0.0
         applied_action[self._rootwz_ind] = 0.0
 
-        print("applied action {}".format(applied_action))
+        #print("applied action {}".format(applied_action))
         #print("set qvels {},{},{}".format(new_velx,new_vely,new_veltheta))
-        print("actual qvels {}".format(self.sim.data.qvel[self._ref_joint_vel_indexes]))
+        #print("actual qvels {}".format(self.sim.data.qvel[self._ref_joint_vel_indexes]))
         self.sim.data.ctrl[:] = applied_action
 
         # gravity compensation
@@ -207,8 +224,15 @@ class JR2Env(MujocoEnv):
 
     def _post_action(self, action):
         """Optionally performs gripper visualization after the actions."""
-        ret = super()._post_action(action)
-        return ret
+        #ret = super()._post_action(action)
+        reward = self.reward(action)
+
+        if self.reset_on_large_force:
+          self.done = ((self.large_force) or (self.timestep >= self.horizon)) and not self.ignore_done 
+        else:
+          self.done = (self.timestep >= self.horizon) and not self.ignore_done 
+          
+        return reward, self.done, {}
 
     def _get_observation(self):
         """
@@ -242,10 +266,12 @@ class JR2Env(MujocoEnv):
   
         di["robot-state"] = np.concatenate(robot_states)
         
-        #print("robot pose {}".format(self.robot_pose_in_world))
-        print("robot state obs {}".format(di))
-  
-        print("eef force/torque {}/{}".format(self._eef_force_measurement,self._eef_torque_measurement))
+        
+        if self.debug_print:
+          print("EEF force/torque {}/{}".format(self._eef_force_measurement,self._eef_torque_measurement))
+          #print("Robot pose {}".format(self.robot_pose_in_world))
+          #print("Robot state obs {}".format(di))
+
         return di
 
     @property
