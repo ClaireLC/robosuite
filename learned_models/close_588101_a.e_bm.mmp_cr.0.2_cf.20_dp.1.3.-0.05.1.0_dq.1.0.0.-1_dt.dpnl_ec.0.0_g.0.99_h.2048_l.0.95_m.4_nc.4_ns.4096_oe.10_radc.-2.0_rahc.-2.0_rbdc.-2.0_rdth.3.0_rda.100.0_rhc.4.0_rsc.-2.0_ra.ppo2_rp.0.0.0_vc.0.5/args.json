@@ -36,6 +36,7 @@
   "rcoef_door_angle": 100.0,
   "rcoef_handle_con": 4.0,
   "rcoef_self_con": -2.0,
+  "rcoef_force": -100,
   "replay": false,
   "rl_alg": "ppo2",
   "robot_pos": [
