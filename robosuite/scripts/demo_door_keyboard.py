@@ -14,16 +14,15 @@ if __name__ == "__main__":
   print(serialize_args(args))
 
   env = suite.make(
-      #"JR2Door",
-      "JR2StaticArmDoor",
-      has_renderer        = args.visualize,
+      "JR2Door",
+      has_renderer        = True,
       use_camera_obs      = False,
       ignore_done         = True,
       control_freq        = args.control_freq,
       horizon             = args.horizon,
       door_type           = args.door_type,
       arena               = args.arena,
-      bot_motion          = args.bot_motion,
+      bot_motion          = "mmp",
       robot_pos           = args.robot_pos,
       dist_to_handle_coef = args.rcoef_dist_to_handle,
       door_angle_coef     = args.rcoef_door_angle,
@@ -31,6 +30,9 @@ if __name__ == "__main__":
       body_door_con_coef  = args.rcoef_body_door_con,
       self_con_coef       = args.rcoef_self_con,
       arm_handle_con_coef = args.rcoef_arm_handle_con,
+      debug_print         = args.print_info,
+      eef_type            = args.eef_type,
+      init_distance       = args.distance,
   )
   
   # initialize device
@@ -46,11 +48,16 @@ if __name__ == "__main__":
           "Invalid device choice: choose 'keyboard'"
       )
 
+  if args.eef_type == "gripper":
+    action_vel = np.zeros(9)
+  else:
+    action_vel = np.zeros(8)
+  
   env.reset()
   #init_qpos = np.array([0.39814922,-0.44719879,0.73021735,-1.63751285,1.77351342,2.30105636,4.70869331,-0.99113772,-2.1977303])
   #env.sim.data.qpos[env._ref_joint_pos_indexes] = init_qpos
   env.render()
-  action_vel = np.zeros(2)
+  
   device.start_control()
   
   while True:

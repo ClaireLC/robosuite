@@ -1,0 +1,315 @@
+<mujoco model="segway_robot">
+    <compiler angle="radian" coordinate="local"/>
+    <!--<size njmax="500" nconmax="100" /> -->
+    <asset>
+        <mesh name="fixed_chassis_collision_with_body" file="meshes/fixed_chassis_collision_with_body.stl" scale="0.8 0.8 1" />
+        <mesh name="fixed_body" file="meshes/fixed_body.stl" scale="0.8 0.8 1" />
+        <mesh name="frogleg_caster_pivot_collision" file="meshes/frogleg_caster_pivot_collision.stl" />
+        <mesh name="tilt_servo_collision" file="meshes/tilt_servo_collision.stl" />
+        <mesh name="touch_screen_collision_with_body" file="meshes/touch_screen_collision_with_body.stl" />
+        <mesh name="right_arm_mount_collision" file="meshes/right_arm_mount_collision.stl" />
+        <mesh name="base" file="meshes/base.stl" />
+        <mesh name="shoulder" file="meshes/shoulder.stl" />
+        <mesh name="arm_mico" file="meshes/arm_mico.stl" />
+        <mesh name="forearm_mico" file="meshes/forearm_mico.stl" />
+        <mesh name="wrist" file="meshes/wrist.stl" />
+        <mesh name="hand_2finger" file="meshes/hand_2finger.stl" />
+        <mesh name="finger_proximal" file="meshes/finger_proximal.stl" />
+        <mesh name="finger_distal" file="meshes/finger_distal.stl" />
+    </asset>
+    
+    <default>
+      <joint damping="0.1"/>
+      <default class="viz">
+        <!-- <geom group="1" /> -->
+        <geom contype="0" conaffinity="0" group="1" />
+      </default>
+      <default class="coll">
+        <geom group="0"/>
+        <!--<geom contype="0" conaffinity="0" group="2" /> -->
+      </default>
+      <default class="site">
+        <geom group="2"/>
+      </default>
+    </default>
+
+<worldbody>
+<body name="base_footprint">
+        <!--<joint name="root" type="free" pos="0 0 0" damping="20"/>-->
+        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="200" frictionloss="2"/>
+        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="200" frictionloss="2"/>
+        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="200" frictionloss="2"/>
+        <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+        <body name="base_link" pos="0 0 0">
+            <body name="base_chassis_link" pos="0 0 0.160568">
+                <inertial pos="0 0 0.202" mass="101.033" diaginertia="5.38268 5.38268 5.38268" />
+                <geom type="mesh" mesh="fixed_chassis_collision_with_body" class="viz"/>
+                <geom type="box" pos="0.02 0 0.25" size="0.3 0.18 0.275" class="coll" name="body"/>
+                <geom type="cylinder" pos="0.0 0 0.6" size="0.1 0.3" class="coll" name="neck"/>
+                <geom type="box" pos="0.0 0 1.0" size="0.15 0.12 0.1" class="coll" name="head"/>
+                <body name="jr2_fixed_body_link" pos="0 0 0">
+                    <inertial pos="0.0659119 0.000991692 0.423671" quat="0.709961 -0.121945 -0.127908 0.681707" mass="132.12" diaginertia="9.60192 9.01036 3.56924" />
+                    <geom type="mesh" mesh="fixed_body" class="viz"/>
+                </body>
+                <body name="left_wheel_link" pos="0 0.27105 0.08">
+                    <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass="20" diaginertia="0.578884 0.303625 0.303625" />
+                    <!--<joint name="left_wheel" pos="0 0 0" axis="0 1 0" /> -->
+                    <geom size="0.2406 0.0461245" quat="0.707107 -0.707106 0 0" type="cylinder" class="viz"/>
+                    <geom size="0.2406 0.0461245" pos="0 0 0.0" quat="0.707107 0.707106 0 0" type="cylinder" class="coll" name="l_wheel_link"/>
+                </body>
+                <body name="right_wheel_link" pos="0 -0.27105 0.08">
+                    <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass="20" diaginertia="0.578884 0.303625 0.303625" />
+                    <!--<joint name="right_wheel" pos="0 0 0" axis="0 1 0" /> -->
+                    <geom size="0.2406 0.0461245" quat="0.707107 0.707106 0 0" type="cylinder" class="viz"/>
+                    <geom size="0.2406 0.0461245" pos="0 0 0.0" quat="0.707107 0.707106 0 0" type="cylinder" class="coll" name="r_wheel_link"/>
+                </body>
+                <body name="front_caster_pivot_link" pos="0.385841 0 0.0511" quat="1.32679e-06 0 0 1">
+                    <inertial pos="0 0 0" mass="0.0001" diaginertia="1e-07 1e-07 1e-07" />
+                    <geom type="mesh" mesh="frogleg_caster_pivot_collision" class="viz"/>
+                    <body name="front_caster_wheel_link" pos="-0.05533 0 -0.125551" quat="0.707107 -0.707106 0 0">
+                        <inertial pos="0 0 0" mass="1" diaginertia="0.002794 0.002794 0.002794" />
+                        <geom size="0.086" class="coll" name="front_caster"/> <!-- collision sphere around caster -->
+                    </body>
+                </body>
+                <body name="rear_caster_pivot_link" pos="-0.314721 0 0.0511">
+                    <inertial pos="0 0 0" mass="0.0001" diaginertia="1e-07 1e-07 1e-07" />
+                    <geom type="mesh" mesh="frogleg_caster_pivot_collision" class="viz"/>
+                    <body name="rear_caster_wheel_link" pos="-0.05533 0 -0.125551" quat="0.707107 -0.707106 0 0">
+                        <inertial pos="0 0 0" mass="1" diaginertia="0.002794 0.002794 0.002794" />
+                        <geom size="0.086" class="coll" name="rear_caster"/> <!-- collision sphere around caster -->
+                    </body>
+                </body>
+
+<!-- Sensor frames --> 
+                <body name="ext_imu_frame" pos="0.05354 0 0.086597" quat="9.38186e-07 0.707107 0.707106 9.38185e-07">
+                    <inertial pos="0.05354 0 0.086597" quat="9.38186e-07 0.707107 0.707106 9.38185e-07" mass="0" diaginertia="0 0 0" />
+                </body>
+                <body name="multi_laser_link" pos="0 0 0.137117">
+                    <inertial pos="0 0 0.137117" mass="0" diaginertia="0 0 0" />
+                </body>
+                <body name="rear_laser_link" pos="-0.336957 0 0.137117" quat="1.32679e-06 0 0 1">
+                    <inertial pos="-0.336957 0 0.137117" quat="1.32679e-06 0 0 1" mass="0" diaginertia="0 0 0" />
+                </body>
+                <body name="front_laser_link" pos="0.405 0 0.137117">
+                    <inertial pos="0.405 0 0.137117" mass="0" diaginertia="0 0 0" />
+                </body>
+                <body name="lower_velodyne_frame" pos="-0.019685 0 0.606982">
+                    <inertial pos="-0.019685 0 0.606982" mass="0" diaginertia="0 0 0" />
+                </body>
+                <body name="occam" pos="-0.019685 0 0.742092" quat="0.500001 -0.5 0.499999 -0.5">
+                    <inertial pos="-0.019685 0 0.742092" quat="0.500001 -0.5 0.499999 -0.5" mass="0" diaginertia="0 0 0" />
+                    <body name="occam_omni_optical_link" pos="0 0 0" quat="0.500001 0.499999 0.5 -0.5">
+                        <inertial pos="0 0 0" quat="0.500001 0.499999 0.5 -0.5" mass="0" diaginertia="0 0 0" />
+                    </body>
+                </body>
+                <body name="upper_velodyne_frame" pos="-0.019685 0 1.07738" quat="0.999097 0 0 0.0424872">
+                    <inertial pos="-0.019685 0 1.07738" quat="0.999097 0 0 0.0424872" mass="0" diaginertia="0 0 0" />
+                </body>
+    
+                <body name="gps_frame" pos="-0.019685 0 1.11624" quat="0.707107 0 0 -0.707106">
+                    <inertial pos="-0.019685 0 1.11624" quat="0.707107 0 0 -0.707106" mass="0" diaginertia="0 0 0" />
+                    <!-- <body name="theta_head_camera_link" pos="0 0 0.02" quat="0.707388 0 0 0.706825">
+                        <inertial pos="0 0 0" quat="0 0.707107 0 0.707107" mass="0.1" diaginertia="0.002159 0.001789 0.001767" />
+                        <geom size="0.0115 0.022 0.065" pos="0 0 0.065" type="box" rgba="0.2 0.2 0.2 1" group="2"/>
+                        <body name="theta_head_camera_optical_frame" pos="0 0 0.107">
+                            <inertial pos="0 0 0.107" mass="0" diaginertia="0 0 0" />
+                        </body>
+                    </body> -->
+                </body>
+<!-- End sensor frames -->
+
+                <body name="pan_link" pos="0.043815 0 0.886186">
+                    <inertial pos="-9.8e-05 -0.000421 0.038035" quat="0.997634 -0.0471245 0.000851844 0.0500493" mass="0.142314" diaginertia="6.51003e-05 5.50888e-05 3.38109e-05" />
+                    <!-- <joint name="pan_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-1.5708 1.5708" /> -->
+                    <geom type="mesh" mesh="tilt_servo_collision" class="viz"/>
+                    <body name="tilt_link" pos="0 0 0.055" quat="0.707107 -0.707106 0 0">
+                        <inertial pos="0.07766 -0.013492 0.006611" quat="0.999789 0.0176014 0.0105451 0.000336512" mass="0.531983" diaginertia="0.00176651 0.00125377 0.000627718" />
+                        <!--<joint name="tilt_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-1.5708 1.5708" />-->
+                        <geom type="mesh" mesh="touch_screen_collision_with_body" class="viz"/>
+                        <body name="jr2_tilt_body_link" pos="0 0 0">
+                            <inertial pos="0 0 0" mass="0" diaginertia="0 0 0" />
+                        </body>
+                        <body name="camera_link" pos="0.08 -0.09 0" quat="0.707388 0.706825 0 0">
+                            <inertial pos="0 0 0" quat="0 0.707107 0 0.707107" mass="0.1" diaginertia="0.002159 0.001789 0.001767" />
+                            <geom size="0.0165 0.0875 0.015" type="box" rgba="0.2 0.2 0.2 1" class="viz"/>
+                            <body name="camera_depth_frame" pos="0 0.06 0">
+                                <inertial pos="0 0.06 0" mass="0" diaginertia="0 0 0" />
+                                <body name="camera_depth_optical_frame" pos="0 0 0" quat="0.500023 -0.5 0.499977 -0.5">
+                                    <inertial pos="0 0 0" quat="0.500023 -0.5 0.499977 -0.5" mass="0" diaginertia="0 0 0" />
+                                </body>
+                            </body>
+                            <body name="camera_rgb_frame" pos="0 0.06 0">
+                                <inertial pos="0 0.06 0" mass="0" diaginertia="0 0 0" />
+                                <body name="camera_rgb_optical_frame" pos="0 0 0" quat="0.500023 -0.5 0.499977 -0.5">
+                                    <inertial pos="0 0 0" quat="0.500023 -0.5 0.499977 -0.5" mass="0" diaginertia="0 0 0" />
+                                </body>
+                            </body>
+                            <body name="left_camera_frame" pos="0 0.06 0">
+                                <inertial pos="0 0.06 0" mass="0" diaginertia="0 0 0" />
+                                <body name="left_camera_optical_frame" pos="0 0 0" quat="0.5 -0.5 0.5 -0.5">
+                                    <inertial pos="0 0 0" quat="0.5 -0.5 0.5 -0.5" mass="0" diaginertia="0 0 0" />
+                                </body>
+                            </body>
+                            <body name="right_camera_frame" pos="0 -0.06 0">
+                                <inertial pos="0 -0.06 0" mass="0" diaginertia="0 0 0" />
+                                <body name="right_camera_optical_frame" pos="0 0 0" quat="0.5 -0.5 0.5 -0.5">
+                                    <inertial pos="0 0 0" quat="0.5 -0.5 0.5 -0.5" mass="0" diaginertia="0 0 0" />
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+
+<!-- Right arm -->
+                <body name="right_arm_mount_link" pos="0 0 0">
+                    <inertial pos="0 0 0" mass="0.0001" diaginertia="1e-07 1e-07 1e-07" />
+                    <geom type="mesh" mesh="right_arm_mount_collision" class="viz"/>
+                </body>
+                <body name="right_arm_attach_link" pos="-0.04446 -0.263 0.431008" quat="0.500001 0.5 0.499999 0.5">
+                    <inertial pos="-0.04446 -0.263 0.431008" quat="0.500001 0.5 0.499999 0.5" mass="0.1" diaginertia="0.1 0.1 0.1" />
+                    <body name="m1n6s200_link_base" pos="0 0 0">
+                        <inertial pos="0 0 0.1255" mass="0.46784" diaginertia="0.1 0.1 0.1" />
+                        <!--<inertial pos="0 0 0.1255" mass="0.46784" diaginertia="0.000951271 0.000951271 0.000374272" /> -->
+                        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="base" class="viz"/>
+                        <geom type="cylinder" pos="0 0 0.12" size="0.04 0.09" class="coll" name="armlink_base"/>
+                        <body name="m1n6s200_link_1" pos="0 0 0.15675" quat="0 0 1 0">
+                            <inertial pos="0 -0.002 -0.0605" mass="0.7477" diaginertia="0.1 0.1 0.1" />
+                            <!--<inertial pos="0 -0.002 -0.0605" mass="0.7477" diaginertia="0.00152032 0.00152032 0.00059816" /> -->
+                            <joint name="m1n6s200_joint_1" pos="0 0 0" axis="0 0 1" limited="true" range="-6.28319 6.28319" />
+                            <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="shoulder" class="viz"/>
+                            <body name="m1n6s200_link_2" pos="0 0.0016 -0.11875" quat="0 0 -0.707107 0.707107">
+                                <!--<inertial pos="0 -0.145 -0.0076" quat="0.707107 0.707107 0 0" mass="0.85968" diaginertia="0.1 0.1 0.1" />-->
+                                <inertial pos="0 -0.145 -0.0076" quat="0.707107 0.707107 0 0" mass="0.85968" diaginertia="0.00467091 0.00467091 0.000386856" />
+                                <joint name="m1n6s200_joint_2" pos="0 0 0" axis="0 0 1" limited="true" range="0.872665 5.41052" />
+                                <site name="ft_2" pos="0.0 0.0 0.0" size="0.01" rgba="0 1 0 1" type="sphere" class="site"/>
+                                <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="arm_mico" class="viz"/>
+                                <geom type="box" pos="0 -0.14 -0.03" size="0.03 0.15 0.01" quat="1 0 0 0" class="coll" name="armlink_2"/>
+                                <body name="m1n6s200_link_3" pos="0 -0.29 0" quat="0 0 1 0">
+                                    <inertial pos="0 0.0463 -0.0065" quat="0.707107 0.707107 0 0" mass="0.606" diaginertia="0.1 0.1 0.1" />
+                                    <!--<inertial pos="0 0.0463 -0.0065" quat="0.707107 0.707107 0 0" mass="0.606" diaginertia="0.000383798 0.000383798 0.0001212" />-->
+                                    <joint name="m1n6s200_joint_3" pos="0 0 0" axis="0 0 1" limited="true" range="0.610865 5.67232" />
+                                    <site name="ft_3" pos="0.0 0.0 0.0" size="0.01" rgba="0 1 0 1" type="sphere" class="site"/>
+                                    <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="forearm_mico" class="viz"/>
+                                    <geom type="cylinder" pos="0 0.06 -0.02" size="0.03 0.09" quat="1 1 0 0" class="coll" name="armlink_3"/>
+                                    <body name="m1n6s200_link_4" pos="0 0.1231 -0.0086" quat="0 0 -0.707107 0.707107">
+                                        <inertial pos="0 -0.037 -0.0642" quat="0.5 0.5 -0.5 0.5" mass="0.426367" diaginertia="0.1 0.1 0.1" />
+                                        <!--<inertial pos="0 -0.037 -0.0642" quat="0.5 0.5 -0.5 0.5" mass="0.426367" diaginertia="0.0001428 7.73497e-05 7.73497e-05" />-->
+                                        <joint name="m1n6s200_joint_4" pos="0 0 0" axis="0 0 1" limited="true" range="-6.28319 6.28319" />
+                                        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="wrist" class="viz"/>
+                                        <!--<geom type="cylinder" pos="0 0 0.05" size="0.02 0.05" quat="1 0 0 0" class="coll"/> -->
+                                        <body name="m1n6s200_link_5" pos="0 -0.03703 -0.06414" quat="0 0 0.5 0.866025">
+                                            <inertial pos="0 -0.037 -0.0642" quat="0.5 0.5 -0.5 0.5" mass="0.426367" diaginertia="0.1 0.1 0.1" />
+                                            <!--<inertial pos="0 -0.037 -0.0642" quat="0.5 0.5 -0.5 0.5" mass="0.426367" diaginertia="0.0001428 7.73497e-05 7.73497e-05" />-->
+                                            <joint name="m1n6s200_joint_5" pos="0 0 0" axis="0 0 1" limited="true" range="-6.28319 6.28319" />
+                                            <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="wrist" class="viz"/>
+                                            <geom type="cylinder" pos="0 0 -0.02" size="0.03 0.03" quat="1 0 0 0" class="coll" name="armlink_5"/>
+                                            <body name="m1n6s200_link_6" pos="0 -0.03703 -0.06414" quat="0 0 0.5 0.866025">
+                                                <inertial pos="0 0 -0.06" quat="0.5 0.5 -0.5 0.5" mass="0.78" diaginertia="0.1 0.1 0.1" />
+                                                <!--<inertial pos="0 0 -0.06" quat="0.5 0.5 -0.5 0.5" mass="0.78" diaginertia="0.000624 0.000370499 0.000370499" />-->
+                                                <joint name="m1n6s200_joint_6" pos="0 0 0" axis="0 0 1" limited="true" range="-6.28319 6.28319" />
+                                                <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="hand_2finger" class="viz"/>
+                                                <geom type="cylinder" pos="0 0 -0.045" size="0.05 0.05" quat="1 0 0 0" class="coll" name="armlink_6"/>
+                                                <geom type="cylinder" pos="0 0 -0.095" size="0.02 0.024" quat="1 0 0 0" class="coll" name="armlink_6_1"/>
+                                                <site name="ft_frame" pos="0.0 0.0 0.0" size="0.01" rgba="0 1 0 1" type="sphere" class="site"/>
+                                                <body name="m1n6s200_end_effector" pos="0 0 -0.16" quat="0 1 0 0">
+                                                    <inertial pos="0 0 0" mass="1e-09" diaginertia="0 0 0" />
+                                                    <!--<geom size="5e-05 5e-05 5e-05" type="box" /> -->
+                                                    <!-- EEF Site - Claw -->
+                                                    <!--<site name="r_grip_site" pos="0 0.0 0" size="0.01" rgba="1 0 0 1" type="sphere" class="site"/>-->
+                                                    <!-- EEF Site - Fingers -->
+                                                    <site name="r_grip_site" pos="0 0.0 -0.025" size="0.01" rgba="1 0 0 1" type="sphere" class="site"/>
+                                                </body>
+                                                    <!-- Force/torque sensor site -->
+                                                <!--<body name="ft_sensor" pos="-0.0025 -0.03095 -0.11482" quat="0.633364 -0.314405 0.633364 -0.314405">
+                                                    <site name="ft_frame" pos="0.0 0.0 0.0" size="0.01 0.01 0.01" rgba="0 1 0 1" type="sphere" class="site"/>
+                                                </body>-->
+                                                <body name="m1n6s200_link_finger_1" pos="-0.0025 0.03095 -0.11482" quat="0.314405 -0.633364 -0.314405 0.633364">
+                                                    <inertial pos="0.022 0 0" mass="0.01" diaginertia="0.1 0.1 0.1" />
+                                                    <!--<inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />-->
+
+                                                    <!-- Fingers -->
+                                                    <joint name="m1n6s200_joint_finger_1" pos="0 0 0" axis="0 0 1" limited="true" range="0 1.32" />
+                                                    <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="finger_proximal" class="viz"/>
+                                                    <geom type="capsule" pos="0.04 -0.01 0" quat="1 0 1 0" size="0.01 0.035" class="coll" name="fingerlink_1"/>
+  
+                                                    <!-- Claw -->
+                                                    <!--<joint name="m1n6s200_joint_finger_1" pos="0 0 0" axis="0 0 1" limited="true" range="0 0.638" />
+                                                    <geom type="capsule" pos="0.04 -0.01 0" quat="1 0 1 0" size="0.01 0.035" class="coll" name="fingerlink_1"/>
+                                                    <geom type="capsule" pos="0.08 0.02 0" quat="0.7071 -0.7071 0 0" size="0.01 0.025" class="coll" name="fingerlink_1_hook"/>
+                                                    <geom type="capsule" pos="0.04 -0.01 0" quat="1 0 1 0" size="0.01 0.035" class="viz"/>
+                                                    <geom type="capsule" pos="0.08 0.02 0" quat="0.7071 -0.7071 0 0" size="0.01 0.025" class="viz"/>-->
+
+                                                    <body name="m1n6s200_link_finger_tip_1" pos="0.044 -0.003 0">
+                                                        <inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />
+                                                        <!-- Fingers -->
+                                                        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="finger_distal" class="viz"/>
+                                                    </body>
+                                                </body>
+                                                <body name="m1n6s200_link_finger_2" pos="-0.0025 -0.03095 -0.11482" quat="0.633364 -0.314405 0.633364 -0.314405">
+                                                    <!--<inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />-->
+                                                    <inertial pos="0.022 0 0" mass="0.01" diaginertia="0.1 0.1 0.1" />
+
+                                                    <!-- Fingers -->
+                                                    <joint name="m1n6s200_joint_finger_2" pos="0 0 0" axis="0 0 1" limited="true" range="0 1.32" />
+                                                    <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="finger_proximal" class="viz"/>
+                                                    <geom type="capsule" pos="0.04 -0.01 0" quat="1 0 1 0" size="0.01 0.035" class="coll" name="fingerlink_2"/>
+
+                                                    <!-- Claw -->
+                                                    <!--<joint name="m1n6s200_joint_finger_2" pos="0 0 0" axis="0 0 1" limited="true" range="0 0.638" />
+                                                    <geom type="capsule" pos="0.04 -0.01 0" quat="1 0 1 0" size="0.01 0.035" class="coll" name="fingerlink_2"/>
+                                                    <geom type="capsule" pos="0.08 0.02 0" quat="0.7071 -0.7071 0 0" size="0.01 0.025" class="coll" name="fingerlink_2_hook"/>
+                                                    <geom type="capsule" pos="0.04 -0.01 0" quat="1 0 1 0" size="0.01 0.035" class="viz"/>
+                                                    <geom type="capsule" pos="0.08 0.02 0" quat="0.7071 -0.7071 0 0" size="0.01 0.025" class="viz"/>-->
+
+                                                    <body name="m1n6s200_link_finger_tip_2" pos="0.044 -0.003 0">
+                                                        <inertial pos="0.022 0 0" mass="0.01" diaginertia="7.89997e-07 7.89997e-07 8e-08" />
+                                                        <!-- Fingers -->
+                                                        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="finger_distal" class="viz"/>
+                                                    </body>
+                                                </body>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+            <!--<body name="belly_camera_link" pos="0.45 0 0.5" quat="0.645394 0.645448 -0.289243 0.288445">
+                <inertial pos="0 0 0" quat="0 0.707107 0 0.707107" mass="0.1" diaginertia="0.002159 0.001789 0.001767" />
+                <geom size="0.0125 0.0125 0.045" pos="0 0 -0.0125" quat="0.707388 0 0.706825 0" type="box" group="1"/>
+            </body>-->
+        </body>
+      </body>
+    </worldbody>
+    <!--<contact>
+      <exclude body1="base_chassis_link" body2="m1n6s200_link_2"/>
+      <exclude body1="base_chassis_link" body2="m1n6s200_link_4"/>
+      <exclude body1="right_arm_attach_link" body2="base_chassis_link"/>
+      <exclude body1="m1n6s200_link_2" body2="m1n6s200_link_4"/>
+    </contact> -->
+
+    <actuator>
+      <velocity joint="rootx" name="vel_rootx" kv="15"   ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="rooty" name="vel_rooty" kv="15"   ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="rootwz" name="vel_rootwz" kv="15" ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="15" ctrlrange="-0.5 0.5" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="15" ctrlrange="-0.5 0.5" ctrllimited="true"/> 
+      <velocity joint="m1n6s200_joint_3" name="vel_m1n6s200_joint_3" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true"/>
+      <velocity joint="m1n6s200_joint_4" name="vel_m1n6s200_joint_4" kv="5" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_5" name="vel_m1n6s200_joint_5" kv="5" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_6" name="vel_m1n6s200_joint_6" kv="5" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_finger_1" name="vel_m1n6s200_joint_finger_1" kv="20" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_finger_2" name="vel_m1n6s200_joint_finger_2" kv="20" ctrlrange="-1 1" ctrllimited="true" />
+
+      <!--<position joint="m1n6s200_joint_finger_1" name="pos_m1n6s200_joint_finger_1" kp="5" ctrlrange="0 1.32" ctrllimited="true" />
+      <position joint="m1n6s200_joint_finger_2" name="pos_m1n6s200_joint_finger_2" kp="5" ctrlrange="0 1.32" ctrllimited="true" />-->
+    </actuator>
+    <sensor>
+      <force name="force_ee" site="ft_frame"/>
+      <torque name="torque_ee" site="ft_frame"/>
+      <force name="force_3" site="ft_3"/>
+      <force name="force_2" site="ft_2"/>
+    </sensor>
+</mujoco>

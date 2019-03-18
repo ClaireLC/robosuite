@@ -189,7 +189,7 @@ class JR2Door(JR2Env):
         #print(arm_handle_con_num)
 
         # Penalize large forces
-        if ((abs(self._eef_force_measurement) > 60).any()):
+        if (abs(np.linalg.norm(self._eef_force_measurement)) > 60):
           rew_eef_force = self.force_coef
           if self.debug_print:
             print("LARGE FORCE {}".format(self._eef_force_measurement))

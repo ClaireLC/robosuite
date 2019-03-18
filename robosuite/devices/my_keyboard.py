@@ -26,12 +26,13 @@ class MyKeyboard(Device):
         self.state = {
                       1: 0.0,
                       2: 0.0,  
-                      #3: 0.0,  
-                      #4: 0.0,  
-                      #5: 0.0,  
-                      #6: 0.0,  
-                      #7: 0.0,  
-                      #8: 0.0,  
+                      3: 0.0,  
+                      4: 0.0,  
+                      5: 0.0,  
+                      6: 0.0,  
+                      7: 0.0,  
+                      8: 0.0,  
+                      9: 0.0,  
                       }
   
     def _display_controls(self):
@@ -65,12 +66,13 @@ class MyKeyboard(Device):
         self.state = {
                       1: 0.0,
                       2: 0.0,  
-                      #3: 0.0,  
-                      #4: 0.0,  
-                      #5: 0.0,  
-                      #6: 0.0,  
-                      #7: 0.0,  
-                      #8: 0.0,  
+                      3: 0.0,  
+                      4: 0.0,  
+                      5: 0.0,  
+                      6: 0.0,  
+                      7: 0.0,  
+                      8: 0.0,  
+                      9: 0.0,  
                       }
 
     def start_control(self):
@@ -113,6 +115,8 @@ class MyKeyboard(Device):
           self.joint  = 7
         elif key == glfw.KEY_8:
           self.joint  = 8
+        elif key == glfw.KEY_9:
+          self.joint  = 9
 
     def on_release(self, window, key, scancode, action, mods):
         """

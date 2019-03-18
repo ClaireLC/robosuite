@@ -6,7 +6,7 @@ import robosuite.utils.transform_utils as T
 from robosuite.environments import MujocoEnv
 
 from robosuite.models.grippers import gripper_factory
-from robosuite.models.robots import JR2
+from robosuite.models.robots import JR2, JR2Gripper
 
 
 class JR2Env(MujocoEnv):
@@ -19,6 +19,7 @@ class JR2Env(MujocoEnv):
         bot_motion="mmp",
         reset_on_large_force=False,
         init_distance=None,
+        eef_type="gripper",
         **kwargs
     ):
         """
@@ -69,12 +70,18 @@ class JR2Env(MujocoEnv):
         self.large_force = False
         self.reset_on_large_force = reset_on_large_force
         self.init_distance = init_distance
+        self.eef_type = eef_type
         super().__init__(**kwargs)
 
     def _load_model(self):
         """Loads robot and optionally add grippers."""
         super()._load_model()
-        self.mujoco_robot = JR2()
+        if self.eef_type == "hook":
+          self.mujoco_robot = JR2()
+        elif self.eef_type == "gripper":
+          self.mujoco_robot = JR2Gripper()
+        else:
+          print("Error: Invalid EEF type")
 
     def _reset_internal(self):
         """Resets the pose of the arm and grippers."""
@@ -148,7 +155,8 @@ class JR2Env(MujocoEnv):
 
         #print("ncon: {}".format(self.sim.data.ncon))
         
-        # action is an 8-dim vector (x,theta,arm joint velocities)
+        # If robot has hook as eef, action is an 8-dim vector (x,theta,arm joint velocities)
+        # If robot has gripper, action is a 9-dim vector
         # Copy the action to a list
         new_action = action.copy().tolist()
 
@@ -164,6 +172,27 @@ class JR2Env(MujocoEnv):
         new_action[self._rootx_ind] = new_velx
         # Insert y velocity into new_action
         new_action.insert(self._rooty_ind,new_vely)
+
+
+        # If JR has a binary gripper, process the fingers' actions
+        if self.eef_type == "gripper":
+          new_action.append(action[8])
+          # gripper state: 1 is open, -1 is closed
+          #gripper_state = action[8]
+          #if action[8] == 0:
+          #  is_open = True
+          #else:
+          #  is_open = False
+          #action[8] = 0.0
+          #new_action.append(0.0)
+
+          # set position of gripper
+          #if is_open:
+          #  self.sim.data.qpos[10] = 0.0
+          #  self.sim.data.qpos[9] = 0.0
+          #else:
+          #  self.sim.data.qpos[10] = 0.638
+          #  self.sim.data.qpos[9] = 0.638
 
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
         # for certain controllers. They later get normalized to the control range.
@@ -185,7 +214,7 @@ class JR2Env(MujocoEnv):
           print("robot y vel:{}".format(vely_robot))
           print("world x vel:{}".format(velx_w))
           print("world y vel:{}".format(vely_w))
-          #print("world wz vel:{}".format(self.sim.data.qvel[self._rootwz_ind]))
+          print("world wz vel:{}".format(self.sim.data.qvel[self._rootwz_ind]))
 
         if (self.bot_motion == "static"):
           self.sim.data.qvel[0] = 0.0
@@ -212,9 +241,10 @@ class JR2Env(MujocoEnv):
         applied_action[self._rooty_ind] = 0.0
         applied_action[self._rootwz_ind] = 0.0
 
-        #print("applied action {}".format(applied_action))
+        if self.debug_print:
+          print("applied action {}".format(applied_action))
         #print("set qvels {},{},{}".format(new_velx,new_vely,new_veltheta))
-        #print("actual qvels {}".format(self.sim.data.qvel[self._ref_joint_vel_indexes]))
+          print("actual qvels {}".format(self.sim.data.qvel[self._ref_joint_vel_indexes]))
         self.sim.data.ctrl[:] = applied_action
 
         # gravity compensation
@@ -268,7 +298,7 @@ class JR2Env(MujocoEnv):
         
         
         if self.debug_print:
-          print("EEF force/torque {}/{}".format(self._eef_force_measurement,self._eef_torque_measurement))
+          print("EEF force/torque {}/{}".format(np.linalg.norm(self._eef_force_measurement),self._eef_torque_measurement))
           #print("Robot pose {}".format(self.robot_pose_in_world))
           #print("Robot state obs {}".format(di))
 

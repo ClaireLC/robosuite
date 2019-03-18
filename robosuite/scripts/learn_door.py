@@ -65,6 +65,7 @@ def main():
       reset_on_large_force= args.reset_on_large_force,
       debug_print         = args.print_info,
       init_distance       = args.distance,
+      eef_type            = args.eef_type,
     )
   )
   

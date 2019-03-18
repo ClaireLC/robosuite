@@ -52,7 +52,7 @@ class JR2StaticArm(Robot):
         # angled body
         #pos = np.array([-0.89198715,1.7414945,1.92991576,-5.45929098,0.38113745,0.07569197])
 
-        # 45 degree body
+        # 45 degree body - arm
         pos = np.array([-1.99673054,1.22329899,1.67109673,5.49132849,-0.66292144,-2.96626974])
         return pos
 
