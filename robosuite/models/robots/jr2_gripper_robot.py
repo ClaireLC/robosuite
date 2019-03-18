@@ -87,7 +87,7 @@ class JR2Gripper(Robot):
         return[
           "fingerlink_2",
           "fingerlink_1",
-          "fingerlink_2_hook",
-          "fingerlink_1_hook",
+          #"fingerlink_2_hook",
+          #"fingerlink_1_hook",
           "armlink_6_1",
         ]
