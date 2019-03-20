@@ -34,6 +34,7 @@ class JR2Door(JR2Env):
         self_con_coef=0.0,
         arm_handle_con_coef=0.0,
         arm_door_con_coef=0.0,
+        gripper_touch_coef=0.0,
         force_coef=0.0,
         debug_print=False,
         **kwargs
@@ -98,6 +99,7 @@ class JR2Door(JR2Env):
         self.arm_handle_con_coef = arm_handle_con_coef
         self.arm_door_con_coef  = arm_door_con_coef
         self.force_coef = force_coef
+        self.gripper_touch_coef = gripper_touch_coef
 
         self.debug_print = debug_print
         print('debug print {}'.format(self.debug_print))
@@ -189,7 +191,7 @@ class JR2Door(JR2Env):
         #print(arm_handle_con_num)
 
         # Penalize large forces
-        if (abs(np.linalg.norm(self._eef_force_measurement)) > 60):
+        if (abs(np.linalg.norm(self._eef_force_measurement)) > 100):
           rew_eef_force = self.force_coef
           if self.debug_print:
             print("LARGE FORCE {}".format(self._eef_force_measurement))
@@ -198,6 +200,15 @@ class JR2Door(JR2Env):
         else:
           rew_eef_force = 0
   
+        # If JR has gripper, check touch sensor in gripper
+        if self.eef_type == "gripper":
+          if self._gripper_touch_measurement>0:
+            rew_gripper_touch = self.gripper_touch_coef
+          else:
+            rew_gripper_touch = 0
+        else:
+            rew_gripper_touch = 0
+
         #print("handle xpos: {}".format(self._door_handle_xpos))
 
         # Reward for going through door
@@ -214,10 +225,10 @@ class JR2Door(JR2Env):
         rew_arm_door_con   = self.arm_door_con_coef * arm_door_con_num
         #print(self.arm_handle_con_coef)
 
-        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con
+        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con + rew_gripper_touch
 
         if self.debug_print:
-          print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con))
+          print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con,rew_gripper_touch))
           print("total reward: {}".format(reward))
 
         return reward
@@ -283,17 +294,25 @@ class JR2Door(JR2Env):
           di["door_pos"] = door_pos
           di["door_quat"] = door_quat
           di["door_handle_pos"] = self._door_handle_xpos 
-          #di["eef_to_handle"] = self._door_handle_xpos - self._r_eef_xpos 
           di["handle_quat"] =  self._door_latch_xquat
           #print(di["handle_quat"])
+
+          # If JR has gripper, check touch sensor in gripper
+          if self.eef_type == "gripper":
+            if self._gripper_touch_measurement>0:
+              di["gripper_touch"] = np.array([1])
+            else:
+              di["gripper_touch"] = np.array([0])
+          else:
+              di["gripper_touch"] = np.array([0])
     
           di["object_state"] = np.concatenate(
             [
               di["door_pos"],
               di["door_quat"],
               di["door_handle_pos"],
-              #di["eef_to_handle"],
               di["handle_quat"],
+              di["gripper_touch"],
             ]
           )
  

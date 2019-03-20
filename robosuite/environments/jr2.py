@@ -296,7 +296,6 @@ class JR2Env(MujocoEnv):
   
         di["robot-state"] = np.concatenate(robot_states)
         
-        
         if self.debug_print:
           print("EEF force/torque {}/{}".format(np.linalg.norm(self._eef_force_measurement),self._eef_torque_measurement))
           #print("Robot pose {}".format(self.robot_pose_in_world))
@@ -469,6 +468,12 @@ class JR2Env(MujocoEnv):
     def _eef_torque_measurement(self):
         """Returns sensor measurement."""
         sensor_id = self.sim.model.sensor_name2id("torque_ee")
+        return self.sim.data.sensordata[sensor_id*3 : sensor_id*3 + 3]
+
+    @property
+    def _gripper_touch_measurement(self):
+        """Returns measurement of touch sensor in robot gripper."""
+        sensor_id = self.sim.model.sensor_name2id("touch_gripper")
         return self.sim.data.sensordata[sensor_id*3 : sensor_id*3 + 3]
 
     @property
