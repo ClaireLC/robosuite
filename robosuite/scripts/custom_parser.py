@@ -94,6 +94,10 @@ def serialize_args(args):
     if key == "config_file": continue
     if key == "device": continue
     if key == "replay": continue
+    if key == "arena": continue
+    if key == "robot_pos": continue
+    if key == "door_pos": continue
+    if key == "door_quat": continue
 
     # Necessary to deal with length
     splits = key.split('_')
