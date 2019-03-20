@@ -42,6 +42,7 @@ def custom_arg_parser():
   parser.add_argument("--rcoef_arm_handle_con", help="Arm links with door handle reward coefficient", type=float)
   parser.add_argument("--rcoef_arm_door_con", help="Arm links with door reward coefficient", type=float)
   parser.add_argument("--rcoef_force", help="Large force reward coefficient", type=float)
+  parser.add_argument("--rcoef_gripper_touch", help="Gripper (inner) touch reward coefficient", type=float)
 
   # Learning parameters
   parser.add_argument("--rl_alg", help="RL algorithm to use", type=str, choices=['ppo1','ppo2'])
@@ -94,6 +95,8 @@ def serialize_args(args):
     if key == "config_file": continue
     if key == "device": continue
     if key == "replay": continue
+    if key == "print_info": continue
+    if key == "control_freq": continue
 
     # Necessary to deal with length
     splits = key.split('_')

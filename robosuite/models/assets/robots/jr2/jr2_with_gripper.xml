@@ -211,6 +211,7 @@
                                                 <geom type="cylinder" pos="0 0 -0.045" size="0.05 0.05" quat="1 0 0 0" class="coll" name="armlink_6"/>
                                                 <geom type="cylinder" pos="0 0 -0.095" size="0.02 0.024" quat="1 0 0 0" class="coll" name="armlink_6_1"/>
                                                 <site name="ft_frame" pos="0.0 0.0 0.0" size="0.01" rgba="0 1 0 1" type="sphere" class="site"/>
+                                                <site name="touch_site" pos="0.0 0.0 -0.119" size="0.02" rgba="0 0 1 1" type="sphere" class="site"/>-->
                                                 <body name="m1n6s200_end_effector" pos="0 0 -0.16" quat="0 1 0 0">
                                                     <inertial pos="0 0 0" mass="1e-09" diaginertia="0 0 0" />
                                                     <!--<geom size="5e-05 5e-05 5e-05" type="box" /> -->
@@ -294,14 +295,14 @@
       <velocity joint="rootx" name="vel_rootx" kv="15"   ctrlrange="-1 1" ctrllimited="true"/>
       <velocity joint="rooty" name="vel_rooty" kv="15"   ctrlrange="-1 1" ctrllimited="true"/>
       <velocity joint="rootwz" name="vel_rootwz" kv="15" ctrlrange="-1 1" ctrllimited="true"/>
-      <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="15" ctrlrange="-0.5 0.5" ctrllimited="true" />
-      <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="15" ctrlrange="-0.5 0.5" ctrllimited="true"/> 
+      <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true"/> 
       <velocity joint="m1n6s200_joint_3" name="vel_m1n6s200_joint_3" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true"/>
       <velocity joint="m1n6s200_joint_4" name="vel_m1n6s200_joint_4" kv="5" ctrlrange="-1 1" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_5" name="vel_m1n6s200_joint_5" kv="5" ctrlrange="-1 1" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_6" name="vel_m1n6s200_joint_6" kv="5" ctrlrange="-1 1" ctrllimited="true" />
-      <velocity joint="m1n6s200_joint_finger_1" name="vel_m1n6s200_joint_finger_1" kv="20" ctrlrange="-1 1" ctrllimited="true" />
-      <velocity joint="m1n6s200_joint_finger_2" name="vel_m1n6s200_joint_finger_2" kv="20" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_finger_1" name="vel_m1n6s200_joint_finger_1" kv="10" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_finger_2" name="vel_m1n6s200_joint_finger_2" kv="10" ctrlrange="-1 1" ctrllimited="true" />
 
       <!--<position joint="m1n6s200_joint_finger_1" name="pos_m1n6s200_joint_finger_1" kp="5" ctrlrange="0 1.32" ctrllimited="true" />
       <position joint="m1n6s200_joint_finger_2" name="pos_m1n6s200_joint_finger_2" kp="5" ctrlrange="0 1.32" ctrllimited="true" />-->
@@ -311,5 +312,6 @@
       <torque name="torque_ee" site="ft_frame"/>
       <force name="force_3" site="ft_3"/>
       <force name="force_2" site="ft_2"/>
+      <touch name="touch_gripper" site="touch_site"/>
     </sensor>
 </mujoco>
