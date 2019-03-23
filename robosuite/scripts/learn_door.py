@@ -67,6 +67,7 @@ def main():
       debug_print         = args.print_info,
       init_distance       = args.distance,
       eef_type            = args.eef_type,
+      door_init_qpos      = args.door_init_qpos,
     )
   )
   

@@ -5,7 +5,7 @@
   "slurm": false,
   "bot_motion": "mmp",
   "arena": "e",
-  "distance": "close",
+  "distance": "open_door",
   "robot_pos": [0,0,0],
   "door_type": "dpnl",
   "door_pos": [1.3,-0.05,1.0],
@@ -36,5 +36,6 @@
   "rcoef_gripper_touch" : 0,
   "reset_on_large_force":false,
   "print_info"          :true,
-  "eef_type"            :"gripper"
+  "eef_type"            :"gripper",
+  "door_init_qpos"      :0.78
 }

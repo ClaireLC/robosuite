@@ -37,6 +37,7 @@ class JR2Door(JR2Env):
         gripper_touch_coef=0.0,
         force_coef=0.0,
         debug_print=False,
+        door_init_qpos=0.0,
         **kwargs
     ):
         """
@@ -85,6 +86,10 @@ class JR2Door(JR2Env):
         self.door_quat = door_quat
         self.robot_pos = robot_pos
         self.arena = arena
+
+        # Door hinge initial pos
+        print(door_init_qpos)
+        self.door_init_qpos = np.array([door_init_qpos])
 
         # whether to use ground-truth object states
         self.use_object_obs = use_object_obs
@@ -149,7 +154,10 @@ class JR2Door(JR2Env):
         Resets simulation internal configurations.
         """
         super()._reset_internal()
-
+        
+        # Reset door hinge angle
+        self.sim.data.qpos[self.door_hinge_joint_id] = self.door_init_qpos
+        print(self.door_init_qpos)
 
     def reward(self, action):
         """
@@ -292,7 +300,8 @@ class JR2Door(JR2Env):
           #print("door pos: {}".format(door_quat))
 
           di["door_pos"] = door_pos
-          di["door_quat"] = door_quat
+          #di["door_quat"] = door_quat
+          di["door_quat"] = np.array([self._door_hinge_pos])
           di["door_handle_pos"] = self._door_handle_xpos 
           di["handle_quat"] =  self._door_latch_xquat
           #print(di["handle_quat"])
@@ -301,6 +310,7 @@ class JR2Door(JR2Env):
           if self.eef_type == "gripper":
             if self._gripper_touch_measurement>0:
               di["gripper_touch"] = np.array([1])
+              #print("object state obs {}".format(di["gripper_touch"]))
             else:
               di["gripper_touch"] = np.array([0])
           else:
@@ -315,8 +325,7 @@ class JR2Door(JR2Env):
               di["gripper_touch"],
             ]
           )
- 
-        #print("object state obs {}".format(di))
+        #print(di)
         return di
 
     def _check_contact(self):

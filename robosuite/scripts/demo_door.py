@@ -19,7 +19,7 @@ if __name__ == "__main__":
       use_camera_obs=False,
       ignore_done=True,
       control_freq=20,
-      door_type="dpnl",
+      door_type           = args.door_type,
       robot_pos=args.robot_pos,
       dist_to_handle_coef = args.rcoef_dist_to_handle,
       door_angle_coef     = args.rcoef_door_angle,
@@ -33,6 +33,7 @@ if __name__ == "__main__":
       debug_print         = args.print_info,
       init_distance       = args.distance,
       eef_type            = args.eef_type,
+      door_init_qpos      = args.door_init_qpos,
   )
   
   env.reset()
@@ -45,9 +46,9 @@ if __name__ == "__main__":
     
   while True:
     action_vel[0] = 0
-    action_vel[1] = 1.0
+    action_vel[1] = 0
     if args.eef_type == "gripper":
-      action_vel[8] = 0.0
+      action_vel[8] = 0.1
     obs, reward, done, _ = env.step(action_vel)
     env.render()
     #print(reward)

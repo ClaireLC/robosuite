@@ -35,6 +35,7 @@ if __name__ == "__main__":
       debug_print         = args.print_info,
       eef_type            = args.eef_type,
       init_distance       = args.distance,
+      door_init_qpos      = args.door_init_qpos,
   )
   
   # initialize device
@@ -67,6 +68,6 @@ if __name__ == "__main__":
     for q, qvel in state.items():
       action_vel[q-1] = qvel 
     obs, reward, done, _ = env.step(action_vel)
-    #print(env.sim.data.qpos[env._ref_joint_pos_indexes])
+    print(env.sim.data.qpos[env._ref_joint_pos_indexes])
     env.render()
     #time.sleep(0.1)
