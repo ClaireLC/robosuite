@@ -298,9 +298,9 @@
       <velocity joint="m1n6s200_joint_1" name="vel_m1n6s200_joint_1" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_2" name="vel_m1n6s200_joint_2" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true"/> 
       <velocity joint="m1n6s200_joint_3" name="vel_m1n6s200_joint_3" kv="10" ctrlrange="-0.5 0.5" ctrllimited="true"/>
-      <velocity joint="m1n6s200_joint_4" name="vel_m1n6s200_joint_4" kv="5" ctrlrange="-1 1" ctrllimited="true" />
-      <velocity joint="m1n6s200_joint_5" name="vel_m1n6s200_joint_5" kv="5" ctrlrange="-1 1" ctrllimited="true" />
-      <velocity joint="m1n6s200_joint_6" name="vel_m1n6s200_joint_6" kv="5" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_4" name="vel_m1n6s200_joint_4" kv="10" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_5" name="vel_m1n6s200_joint_5" kv="10" ctrlrange="-1 1" ctrllimited="true" />
+      <velocity joint="m1n6s200_joint_6" name="vel_m1n6s200_joint_6" kv="15" ctrlrange="-1 1" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_finger_1" name="vel_m1n6s200_joint_finger_1" kv="10" ctrlrange="-1 1" ctrllimited="true" />
       <velocity joint="m1n6s200_joint_finger_2" name="vel_m1n6s200_joint_finger_2" kv="10" ctrlrange="-1 1" ctrllimited="true" />
 
