@@ -63,6 +63,8 @@ def main():
       arm_door_con_coef   = args.rcoef_arm_door_con,
       force_coef          = args.rcoef_force,
       gripper_touch_coef  = args.rcoef_gripper_touch,
+      dist_to_door_coef   = args.rcoef_dist_to_door,
+      wall_con_coef       = args.rcoef_wall_con,
       reset_on_large_force= args.reset_on_large_force,
       debug_print         = args.print_info,
       init_distance       = args.distance,

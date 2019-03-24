@@ -32,6 +32,8 @@ if __name__ == "__main__":
       arm_handle_con_coef = args.rcoef_arm_handle_con,
       force_coef          = args.rcoef_force,
       gripper_touch_coef  = args.rcoef_gripper_touch,
+      dist_to_door_coef   = args.rcoef_dist_to_door,
+      wall_con_coef       = args.rcoef_wall_con,
       debug_print         = args.print_info,
       eef_type            = args.eef_type,
       init_distance       = args.distance,

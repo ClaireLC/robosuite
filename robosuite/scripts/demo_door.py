@@ -29,6 +29,8 @@ if __name__ == "__main__":
       arm_handle_con_coef = args.rcoef_arm_handle_con,
       arm_door_con_coef   = args.rcoef_arm_door_con,
       force_coef          = args.rcoef_force,
+      dist_to_door_coef   = args.rcoef_dist_to_door,
+      wall_con_coef       = args.rcoef_wall_con,
       reset_on_large_force= args.reset_on_large_force,
       debug_print         = args.print_info,
       init_distance       = args.distance,
@@ -45,10 +47,10 @@ if __name__ == "__main__":
     action_vel = np.zeros(8)
     
   while True:
-    action_vel[0] = 0
-    action_vel[1] = 0
+    action_vel[0] = 0.8
+    action_vel[1] = 1.0
     if args.eef_type == "gripper":
-      action_vel[8] = 0.1
+      action_vel[8] = 0
     obs, reward, done, _ = env.step(action_vel)
     env.render()
     #print(reward)
