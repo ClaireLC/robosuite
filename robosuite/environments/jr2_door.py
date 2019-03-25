@@ -237,8 +237,8 @@ class JR2Door(JR2Env):
         y_dist = abs(self.robot_base_pos[1] - self._door_center_pos[1])
         x_diff = self.robot_base_pos[0] - self._door_center_pos[0]
         base_to_door_dist = np.linalg.norm(self.robot_base_pos[0:2] - self._door_center_pos[0:2])
-        rew_dist_to_door = (x_diff - np.tanh(y_dist)) * self.dist_to_door_coef
-        #rew_dist_to_door = 1 - np.tanh(base_to_door_dist)
+        #rew_dist_to_door = (x_diff - np.tanh(y_dist)) * self.dist_to_door_coef
+        rew_dist_to_door = self.dist_to_door_coef * (1 - np.tanh(base_to_door_dist))
 
         # Check contact with walls
         if (self.door_type == "dpnlr"):
@@ -257,7 +257,7 @@ class JR2Door(JR2Env):
         rew_arm_door_con   = self.arm_door_con_coef * arm_door_con_num
         #print(self.arm_handle_con_coef)
 
-        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con + rew_gripper_touch + rew_dist_to_door + rew_wall_con
+        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con + rew_gripper_touch + rew_dist_to_door + rew_wall_con + rew_arm_handle_con
 
         if self.debug_print:
           print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con,rew_gripper_touch))
