@@ -36,9 +36,9 @@
 <worldbody>
 <body name="base_footprint">
         <!--<joint name="root" type="free" pos="0 0 0" damping="20"/>-->
-        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="200" frictionloss="2"/>
-        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="200" frictionloss="2"/>
-        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="200" frictionloss="2"/>
+        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="10" frictionloss="1"/>
+        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="10" frictionloss="1"/>
+        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="10" frictionloss="1"/>
         <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
         <body name="base_link" pos="0 0 0">
             <body name="base_chassis_link" pos="0 0 0.160568">

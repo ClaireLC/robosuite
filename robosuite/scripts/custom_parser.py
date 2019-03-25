@@ -23,7 +23,7 @@ def custom_arg_parser():
   # Environment parameters
   parser.add_argument("--print_info", help="Specifies whether or not debug information is printed",type=str2bool)
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
-  parser.add_argument("--eef_type", help="End effector type", type=str, choices=['hook','gripper'])
+  parser.add_argument("--eef_type", help="End effector type", type=str, choices=['hook','gripper','static'])
   parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl','dpnlr'])
   parser.add_argument("--arena", help="Arena type, either empty or room", type=str, choices=['e','r'])
   parser.add_argument("--distance", help="Distance from robot to door", type=str)

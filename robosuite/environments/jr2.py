@@ -6,7 +6,7 @@ import robosuite.utils.transform_utils as T
 from robosuite.environments import MujocoEnv
 
 from robosuite.models.grippers import gripper_factory
-from robosuite.models.robots import JR2, JR2Gripper
+from robosuite.models.robots import JR2, JR2Gripper, JR2StaticArm
 
 
 class JR2Env(MujocoEnv):
@@ -80,6 +80,8 @@ class JR2Env(MujocoEnv):
           self.mujoco_robot = JR2()
         elif self.eef_type == "gripper":
           self.mujoco_robot = JR2Gripper()
+        elif self.eef_type == "static":
+          self.mujoco_robot = JR2StaticArm()
         else:
           print("Error: Invalid EEF type")
 
@@ -89,55 +91,97 @@ class JR2Env(MujocoEnv):
           print("\nRESETTING ENVIRONMENT")
 
         super()._reset_internal()
-        self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos(self.init_distance)
-        self.large_force = False
+        if self.eef_type == "static":
+          # Reset base and arm 
+          self.sim.data.qpos[self._ref_base_joint_pos_indexes] = self.mujoco_robot.init_base_qpos
+          self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
+          self.large_force = False
+        else:
+          self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos(self.init_distance)
+          self.large_force = False
 
     def _get_reference(self):
         """Sets up references for robots, grippers, and objects."""
         super()._get_reference()
 
-        # indices for joints in qpos, qvel
-        self.robot_joints = list(self.mujoco_robot.joints)
-        #print(self.robot_joints)
-        self._ref_joint_pos_indexes = [
-            self.sim.model.get_joint_qpos_addr(x) for x in self.robot_joints
-        ]
-        self._ref_joint_vel_indexes = [
-            self.sim.model.get_joint_qvel_addr(x) for x in self.robot_joints
-        ]
-        if self.use_indicator_object:
-            ind_qpos = self.sim.model.get_joint_qpos_addr("pos_indicator")
-            self._ref_indicator_pos_low, self._ref_indicator_pos_high = ind_qpos
+        # If robot has static arm:
+        if self.eef_type == "static":
+          # indices for joints in qpos, qvel
+          self.robot_base_joints = list(self.mujoco_robot.base_joints)
+          self.robot_arm_joints = list(self.mujoco_robot.arm_joints)
 
-            ind_qvel = self.sim.model.get_joint_qvel_addr("pos_indicator")
-            self._ref_indicator_vel_low, self._ref_indicator_vel_high = ind_qvel
+          self._ref_base_joint_pos_indexes = [
+              self.sim.model.get_joint_qpos_addr(x) for x in self.robot_base_joints
+          ]
+          self._ref_base_joint_vel_indexes = [
+              self.sim.model.get_joint_qvel_addr(x) for x in self.robot_base_joints
+          ]
+          self._ref_arm_joint_pos_indexes = [
+              self.sim.model.get_joint_qpos_addr(x) for x in self.robot_arm_joints
+          ]
+          self._ref_arm_joint_vel_indexes = [
+              self.sim.model.get_joint_qvel_addr(x) for x in self.robot_arm_joints
+          ]
+          self._rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
+          self._rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
+          self._rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
 
-            self.indicator_id = self.sim.model.body_name2id("pos_indicator")
+          # indices for joint pos actuation, joint vel actuation, gripper actuation
+          self._ref_joint_pos_actuator_indexes = [
+              self.sim.model.actuator_name2id(actuator)
+              for actuator in self.sim.model.actuator_names
+              if actuator.startswith("pos")
+          ]
 
-        # indices for joint pos actuation, joint vel actuation, gripper actuation
-        self._ref_joint_pos_actuator_indexes = [
-            self.sim.model.actuator_name2id(actuator)
-            for actuator in self.sim.model.actuator_names
-            if actuator.startswith("pos")
-        ]
-
-        self._ref_joint_vel_actuator_indexes = [
-            self.sim.model.actuator_name2id(actuator)
-            for actuator in self.sim.model.actuator_names
-            if actuator.startswith("vel")
-        ]
-        self._rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
-        self._rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
-        self._rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
+          self._ref_joint_vel_actuator_indexes = [
+              self.sim.model.actuator_name2id(actuator)
+              for actuator in self.sim.model.actuator_names
+              if actuator.startswith("vel")
+          ]
     
-        self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
+          self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
 
-        self._ref_sensor_indexes = [
-            self.sim.model.sensor_name2id(sensor)
-            for sensor in self.sim.model.sensor_names
-        ]
+          self.prev_base_pos = self.sim.data.qpos[self._ref_base_joint_pos_indexes]
+        else:
+          # Indices for joints in qpos, qvel
+          self.robot_joints = list(self.mujoco_robot.joints)
+          #print(self.robot_joints)
+          self._ref_joint_pos_indexes = [
+              self.sim.model.get_joint_qpos_addr(x) for x in self.robot_joints
+          ]
+          self._ref_joint_vel_indexes = [
+              self.sim.model.get_joint_qvel_addr(x) for x in self.robot_joints
+          ]
+          if self.use_indicator_object:
+              ind_qpos = self.sim.model.get_joint_qpos_addr("pos_indicator")
+              self._ref_indicator_pos_low, self._ref_indicator_pos_high = ind_qpos
 
-        self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
+              ind_qvel = self.sim.model.get_joint_qvel_addr("pos_indicator")
+              self._ref_indicator_vel_low, self._ref_indicator_vel_high = ind_qvel
+
+              self.indicator_id = self.sim.model.body_name2id("pos_indicator")
+
+          # Indices for joint pos actuation, joint vel actuation, gripper actuation
+          self._ref_joint_pos_actuator_indexes = [
+              self.sim.model.actuator_name2id(actuator)
+              for actuator in self.sim.model.actuator_names
+              if actuator.startswith("pos")
+          ]
+
+          self._ref_joint_vel_actuator_indexes = [
+              self.sim.model.actuator_name2id(actuator)
+              for actuator in self.sim.model.actuator_names
+              if actuator.startswith("vel")
+          ]
+
+          # Joint qvel IDs
+          self._rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
+          self._rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
+          self._rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
+    
+          self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
+
+          self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
 
     def move_indicator(self, pos):
         """Moves the position of the indicator object to @pos."""
@@ -148,32 +192,83 @@ class JR2Env(MujocoEnv):
 
     # Note: Overrides super
     def _pre_action(self, action):
-        velx_w = self.sim.data.qvel[self._rootx_ind]
-        vely_w = self.sim.data.qvel[self._rooty_ind]
-        velx_robot = velx_w * np.cos(self.theta_w) + vely_w * np.sin(self.theta_w)
-        vely_robot = - velx_w * np.sin(self.theta_w) + vely_w * np.cos(self.theta_w)
 
-        #print("ncon: {}".format(self.sim.data.ncon))
-        
-        # If robot has hook as eef, action is an 8-dim vector (x,theta,arm joint velocities)
-        # If robot has gripper, action is a 9-dim vector
-        # Copy the action to a list
-        new_action = action.copy().tolist()
+      velx_w = self.sim.data.qvel[self._rootx_ind]
+      vely_w = self.sim.data.qvel[self._rooty_ind]
+      velx_robot = velx_w * np.cos(self.theta_w) + vely_w * np.sin(self.theta_w)
+      vely_robot = - velx_w * np.sin(self.theta_w) + vely_w * np.cos(self.theta_w)
 
-        if self.debug_print:
-          print("Robot pre_action info")
-          print("Policy action {}".format(new_action))
+      # If robot has hook as eef, action is an 8-dim vector (x,theta,arm joint velocities)
+      # If robot has gripper, action is a 9-dim vector
+      # Copy the action to a list
+      new_action = action.copy().tolist()
+      if self.debug_print:
+        print("\nRobot pre_action info")
+        print("Policy action {}".format(new_action))
 
-        # Transate robot's x_vel to x and y velocities for x and y actuators
-        new_velx = action[self._rootx_ind] * np.cos(self.theta_w)
-        new_vely = action[self._rootx_ind] * np.sin(self.theta_w)
-  
-        # Update x velocity in new_action
-        new_action[self._rootx_ind] = new_velx
-        # Insert y velocity into new_action
-        new_action.insert(self._rooty_ind,new_vely)
+      # Transate robot's x_vel to x and y velocities for x and y actuators
+      new_velx = action[self._rootx_ind] * np.cos(self.theta_w)
+      new_vely = action[self._rootx_ind] * np.sin(self.theta_w)
+      # Update x velocity in new_action
+      new_action[self._rootx_ind] = new_velx
+      # Insert y velocity into new_action
+      new_action.insert(self._rooty_ind,new_vely)
 
+      if self.eef_type == "static":
+        # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
+        # for certain controllers. They later get normalized to the control range.
+        if self.rescale_actions:
+            new_action = np.clip(new_action, -1, 1)
 
+        if self.rescale_actions:
+            # rescale normalized action to control ranges
+            ctrl_range = self.sim.model.actuator_ctrlrange
+            bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
+            weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
+            applied_action = bias + weight * new_action
+        else:
+            applied_action = new_action
+
+        if (self.bot_motion == "static"):
+          self.sim.data.qvel[0] = 0.0
+          self.sim.data.qvel[1] = 0.0
+          self.sim.data.qvel[2] = 0.0
+        else:
+          action_scale = 0.05
+          new_velx = weight[self._rootx_ind] * applied_action[self._rootx_ind] * action_scale
+          new_vely = weight[self._rooty_ind] * applied_action[self._rooty_ind] * action_scale
+          new_veltheta = weight[self._rootwz_ind] * applied_action[self._rootwz_ind] * action_scale
+          self.sim.data.qvel[self._rootx_ind] = new_velx
+          self.sim.data.qvel[self._rooty_ind] = new_vely
+          self.sim.data.qvel[self._rootwz_ind] = new_veltheta
+          #print("robot y vel:{}".format(vely_robot))
+          if (abs(vely_robot) > 0.001):
+            if self.debug_print:
+              print("SLIPPING robot y vel:{}".format(vely_robot))
+            self.sim.data.qpos[self._rooty_ind] = self.prev_base_y_pos
+          else:
+            self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
+
+        # Set x,y velocity commands to 0, to solve the problem of sliding base
+        applied_action[self._rootx_ind] = 0.0
+        applied_action[self._rooty_ind] = 0.0
+        applied_action[self._rootwz_ind] = 0.0
+
+        #self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
+        self.sim.data.qvel[self._ref_arm_joint_vel_indexes] = 0.0
+        print("applied action {}".format(applied_action))
+        #print("set qvels {},{},{}".format(new_velx,new_vely,new_veltheta))
+        print("actual qvels {}".format(self.sim.data.qvel[self._ref_base_joint_vel_indexes]))
+        self.sim.data.ctrl[:] = applied_action
+
+        # gravity compensation
+        self.sim.data.qfrc_applied[
+            self._ref_arm_joint_vel_indexes
+        ] = self.sim.data.qfrc_bias[self._ref_arm_joint_vel_indexes]
+        self.sim.data.qfrc_applied[
+            self._ref_base_joint_vel_indexes
+        ] = self.sim.data.qfrc_bias[self._ref_base_joint_vel_indexes]
+      else:
         # If JR has a binary gripper, process the fingers' actions
         if self.eef_type == "gripper":
           new_action.append(action[8])
@@ -275,13 +370,20 @@ class JR2Env(MujocoEnv):
         self._check_contact()
 
         # proprioceptive features
-        di["joint_pos"] = np.array(
-            [self.sim.data.qpos[x] for x in self._ref_joint_pos_indexes]
-        )
-        #print(di["joint_pos"])
-        di["joint_vel"] = np.array(
-            [self.sim.data.qvel[x] for x in self._ref_joint_vel_indexes]
-        )
+        if self.eef_type == "static":
+          di["joint_pos"] = np.array(
+              [self.sim.data.qpos[x] for x in self._ref_base_joint_pos_indexes]
+          )
+          di["joint_vel"] = np.array(
+              [self.sim.data.qvel[x] for x in self._ref_base_joint_vel_indexes]
+          )
+        else:
+          di["joint_pos"] = np.array(
+              [self.sim.data.qpos[x] for x in self._ref_joint_pos_indexes]
+          )
+          di["joint_vel"] = np.array(
+              [self.sim.data.qvel[x] for x in self._ref_joint_vel_indexes]
+          )
         di["r_eef_xpos"] = self._r_eef_xpos
         di["r_eef_xquat"] = self._r_eef_xquat
         di["robot_base_pos"] = self.robot_base_pos
@@ -455,8 +557,8 @@ class JR2Env(MujocoEnv):
 
     @property
     def _r_eef_xquat(self):
-        """Returns the position of the right hand site in world frame."""
-        return T.mat2quat(self.sim.data.site_xmat[self.r_grip_site_id].reshape((3,3)))
+       """Returns the position of the right hand site in world frame."""
+       return T.mat2quat(self.sim.data.site_xmat[self.r_grip_site_id].reshape((3,3)))
 
     @property
     def _eef_force_measurement(self):
