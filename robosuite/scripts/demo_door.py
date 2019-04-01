@@ -43,11 +43,13 @@ if __name__ == "__main__":
   
   if args.eef_type == "gripper":
     action_vel = np.zeros(9)
+  elif args.eef_type == "static":
+    action_vel = np.zeros(2)
   else:
     action_vel = np.zeros(8)
     
   while True:
-    action_vel[0] = 0.8
+    action_vel[0] = 0
     action_vel[1] = 1.0
     if args.eef_type == "gripper":
       action_vel[8] = 0

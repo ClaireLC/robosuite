@@ -21,18 +21,18 @@ class MyKeyboard(Device):
 
         self._reset_state = 0
         self._enabled = False
-        self._vel_step = 0.01
+        self._vel_step = 0.1
     
         self.state = {
                       1: 0.0,
                       2: 0.0,  
-                      3: 0.0,  
-                      4: 0.0,  
-                      5: 0.0,  
-                      6: 0.0,  
-                      7: 0.0,  
-                      8: 0.0,  
-                      9: 0.0,  
+                      #3: 0.0,  
+                      #4: 0.0,  
+                      #5: 0.0,  
+                      #6: 0.0,  
+                      #7: 0.0,  
+                      #8: 0.0,  
+                      #9: 0.0,  
                       }
   
     def _display_controls(self):
@@ -66,13 +66,13 @@ class MyKeyboard(Device):
         self.state = {
                       1: 0.0,
                       2: 0.0,  
-                      3: 0.0,  
-                      4: 0.0,  
-                      5: 0.0,  
-                      6: 0.0,  
-                      7: 0.0,  
-                      8: 0.0,  
-                      9: 0.0,  
+                      #3: 0.0,  
+                      #4: 0.0,  
+                      #5: 0.0,  
+                      #6: 0.0,  
+                      #7: 0.0,  
+                      #8: 0.0,  
+                      #9: 0.0,  
                       }
 
     def start_control(self):

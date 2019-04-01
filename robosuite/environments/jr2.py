@@ -122,9 +122,6 @@ class JR2Env(MujocoEnv):
           self._ref_arm_joint_vel_indexes = [
               self.sim.model.get_joint_qvel_addr(x) for x in self.robot_arm_joints
           ]
-          self._rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
-          self._rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
-          self._rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
 
           # indices for joint pos actuation, joint vel actuation, gripper actuation
           self._ref_joint_pos_actuator_indexes = [
@@ -141,7 +138,6 @@ class JR2Env(MujocoEnv):
     
           self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
 
-          self.prev_base_pos = self.sim.data.qpos[self._ref_base_joint_pos_indexes]
         else:
           # Indices for joints in qpos, qvel
           self.robot_joints = list(self.mujoco_robot.joints)
@@ -174,14 +170,7 @@ class JR2Env(MujocoEnv):
               if actuator.startswith("vel")
           ]
 
-          # Joint qvel IDs
-          self._rootwz_ind = self.sim.model.get_joint_qvel_addr("rootwz")
-          self._rootx_ind = self.sim.model.get_joint_qvel_addr("rootx")
-          self._rooty_ind = self.sim.model.get_joint_qvel_addr("rooty")
-    
           self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
-
-          self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
 
     def move_indicator(self, pos):
         """Moves the position of the indicator object to @pos."""
@@ -192,12 +181,6 @@ class JR2Env(MujocoEnv):
 
     # Note: Overrides super
     def _pre_action(self, action):
-
-      velx_w = self.sim.data.qvel[self._rootx_ind]
-      vely_w = self.sim.data.qvel[self._rooty_ind]
-      velx_robot = velx_w * np.cos(self.theta_w) + vely_w * np.sin(self.theta_w)
-      vely_robot = - velx_w * np.sin(self.theta_w) + vely_w * np.cos(self.theta_w)
-
       # If robot has hook as eef, action is an 8-dim vector (x,theta,arm joint velocities)
       # If robot has gripper, action is a 9-dim vector
       # Copy the action to a list
@@ -206,53 +189,18 @@ class JR2Env(MujocoEnv):
         print("\nRobot pre_action info")
         print("Policy action {}".format(new_action))
 
-      # Transate robot's x_vel to x and y velocities for x and y actuators
-      new_velx = action[self._rootx_ind] * np.cos(self.theta_w)
-      new_vely = action[self._rootx_ind] * np.sin(self.theta_w)
-      # Update x velocity in new_action
-      new_action[self._rootx_ind] = new_velx
-      # Insert y velocity into new_action
-      new_action.insert(self._rooty_ind,new_vely)
-
       if self.eef_type == "static":
-        # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
-        # for certain controllers. They later get normalized to the control range.
-        if self.rescale_actions:
-            new_action = np.clip(new_action, -1, 1)
-
         if self.rescale_actions:
             # rescale normalized action to control ranges
             ctrl_range = self.sim.model.actuator_ctrlrange
             bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
             weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
             applied_action = bias + weight * new_action
+        
+            # Clip
+            new_action = np.clip(new_action, -1, 1)
         else:
             applied_action = new_action
-
-        if (self.bot_motion == "static"):
-          self.sim.data.qvel[0] = 0.0
-          self.sim.data.qvel[1] = 0.0
-          self.sim.data.qvel[2] = 0.0
-        else:
-          action_scale = 0.05
-          new_velx = weight[self._rootx_ind] * applied_action[self._rootx_ind] * action_scale
-          new_vely = weight[self._rooty_ind] * applied_action[self._rooty_ind] * action_scale
-          new_veltheta = weight[self._rootwz_ind] * applied_action[self._rootwz_ind] * action_scale
-          self.sim.data.qvel[self._rootx_ind] = new_velx
-          self.sim.data.qvel[self._rooty_ind] = new_vely
-          self.sim.data.qvel[self._rootwz_ind] = new_veltheta
-          #print("robot y vel:{}".format(vely_robot))
-          if (abs(vely_robot) > 0.001):
-            if self.debug_print:
-              print("SLIPPING robot y vel:{}".format(vely_robot))
-            self.sim.data.qpos[self._rooty_ind] = self.prev_base_y_pos
-          else:
-            self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
-
-        # Set x,y velocity commands to 0, to solve the problem of sliding base
-        applied_action[self._rootx_ind] = 0.0
-        applied_action[self._rooty_ind] = 0.0
-        applied_action[self._rootwz_ind] = 0.0
 
         #self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
         self.sim.data.qvel[self._ref_arm_joint_vel_indexes] = 0.0

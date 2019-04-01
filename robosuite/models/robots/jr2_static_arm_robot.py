@@ -9,7 +9,7 @@ class JR2StaticArm(Robot):
     def __init__(self):
         super().__init__(xml_path_completion("robots/jr2/jr2_static_arm.xml"))
 
-        self.bottom_offset = np.array([0, 0, -0.01])
+        self.bottom_offset = np.array([0, 0, 0.0])
 
     def set_base_xpos(self, pos):
         """Places the robot on position @pos."""
@@ -34,15 +34,14 @@ class JR2StaticArm(Robot):
     @property
     def base_joints(self):
         return [
-                "rootx",
-                "rooty",
-                "rootwz",
+                "left_wheel",
+                "right_wheel",
                ]
 
     @property
     def init_arm_qpos(self):
         # extended arm
-        #pos = np.array([-1.71255116,2.80531801,3.29199776,1.71876122,0.04361478,-0.00627881])
+        pos = np.array([-1.71255116,2.80531801,3.29199776,1.71876122,0.04361478,-0.00627881])
         # bent arm
         #pos = np.array([-1.66453506,1.98583623,2.01604606,1.71591313,0.02474466,-0.00216071])
       
@@ -53,7 +52,7 @@ class JR2StaticArm(Robot):
         #pos = np.array([-0.89198715,1.7414945,1.92991576,-5.45929098,0.38113745,0.07569197])
 
         # 45 degree body - arm
-        pos = np.array([-1.99673054,1.22329899,1.67109673,5.49132849,-0.66292144,-2.96626974])
+        #pos = np.array([-1.99673054,1.22329899,1.67109673,5.49132849,-0.66292144,-2.96626974])
         return pos
 
     @property
@@ -71,9 +70,9 @@ class JR2StaticArm(Robot):
         #pos = np.array([0.48012223,-0.52841338,0.32938552])
 
         # 45 degree body
-        pos = np.array([0.41899952,-0.3610791,0.85207989])
+        #pos = np.array([0.41899952,-0.3610791,0.85207989])
 
-        #pos = np.zeros(3)
+        pos = np.zeros(2)
 
         return pos
     

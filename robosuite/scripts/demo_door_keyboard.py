@@ -55,6 +55,8 @@ if __name__ == "__main__":
 
   if args.eef_type == "gripper":
     action_vel = np.zeros(9)
+  elif args.eef_type == "static":
+    action_vel = np.zeros(2)
   else:
     action_vel = np.zeros(8)
   
@@ -70,6 +72,6 @@ if __name__ == "__main__":
     for q, qvel in state.items():
       action_vel[q-1] = qvel 
     obs, reward, done, _ = env.step(action_vel)
-    print(env.sim.data.qpos[env._ref_joint_pos_indexes])
+    #print(env.sim.data.qpos[env._ref_joint_pos_indexes])
     env.render()
     #time.sleep(0.1)

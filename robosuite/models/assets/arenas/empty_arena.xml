@@ -5,7 +5,7 @@
     <material name="floorplane" reflectance="0.5" texrepeat="1 1" texture="texplane" texuniform="true"/>
   </asset>
   <worldbody>
-    <geom condim="3" material="floorplane" name="floor" pos="0 0 0" size="5 5 .125" type="plane"/>
+    <geom condim="3" conaffinity="1" material="floorplane" name="floor" pos="0 0 0" size="5 5 .125" type="plane" friction="1 0.5 0.5"/>
 
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="1 1 4.0" specular="0.3 0.3 0.3"/>
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="-3. -3. 4.0" specular="0.3 0.3 0.3"/>
