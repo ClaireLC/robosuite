@@ -217,8 +217,6 @@ class JR2Env(MujocoEnv):
       if self.eef_type == "static":
         # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
         # for certain controllers. They later get normalized to the control range.
-        if self.rescale_actions:
-            new_action = np.clip(new_action, -1, 1)
 
         if self.rescale_actions:
             # rescale normalized action to control ranges
@@ -226,6 +224,7 @@ class JR2Env(MujocoEnv):
             bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
             weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
             applied_action = bias + weight * new_action
+            new_action = np.clip(new_action, -1, 1)
         else:
             applied_action = new_action
 
@@ -238,6 +237,12 @@ class JR2Env(MujocoEnv):
           new_velx = weight[self._rootx_ind] * applied_action[self._rootx_ind] * action_scale
           new_vely = weight[self._rooty_ind] * applied_action[self._rooty_ind] * action_scale
           new_veltheta = weight[self._rootwz_ind] * applied_action[self._rootwz_ind] * action_scale
+
+          # Clip velocities
+          new_velx = np.clip(new_velx,-1,1)
+          new_vely = np.clip(new_velx,-1,1)
+          new_veltheta = np.clip(new_veltheta,-1,1)
+
           self.sim.data.qvel[self._rootx_ind] = new_velx
           self.sim.data.qvel[self._rooty_ind] = new_vely
           self.sim.data.qvel[self._rootwz_ind] = new_veltheta
@@ -289,17 +294,15 @@ class JR2Env(MujocoEnv):
           #  self.sim.data.qpos[10] = 0.638
           #  self.sim.data.qpos[9] = 0.638
 
-        # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
-        # for certain controllers. They later get normalized to the control range.
         if self.rescale_actions:
-            new_action = np.clip(new_action, -1, 1)
-
-        if self.rescale_actions:
-            # rescale normalized action to control ranges
+            # Rescale normalized action to control ranges
             ctrl_range = self.sim.model.actuator_ctrlrange
             bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
             weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
             applied_action = bias + weight * new_action
+          
+            # Clip actions
+            new_action = np.clip(new_action, -1, 1)
         else:
             applied_action = new_action
 
@@ -320,6 +323,11 @@ class JR2Env(MujocoEnv):
           new_velx = weight[self._rootx_ind] * applied_action[self._rootx_ind] * action_scale
           new_vely = weight[self._rooty_ind] * applied_action[self._rooty_ind] * action_scale
           new_veltheta = weight[self._rootwz_ind] * applied_action[self._rootwz_ind] * action_scale
+      
+          # Clip velocities
+          new_velx = np.clip(new_velx,-1,1)
+          new_vely = np.clip(new_velx,-1,1)
+          new_veltheta = np.clip(new_veltheta,-1,1)
           self.sim.data.qvel[self._rootx_ind] = new_velx
           self.sim.data.qvel[self._rooty_ind] = new_vely
           self.sim.data.qvel[self._rootwz_ind] = new_veltheta
