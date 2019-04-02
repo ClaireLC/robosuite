@@ -35,13 +35,8 @@
 
 <worldbody>
 <body name="base_footprint">
-        <!--<joint name="root" type="free" pos="0 0 0" damping="20"/>
-        <joint name="rootx" type="slide" pos="0 0 0" axis="1 0 0"  damping="10" frictionloss="1"/>
-        <joint name="rooty" type="slide" pos="0 0 0" axis="0 1 0"  damping="10" frictionloss="1"/>
-        <joint name="rootwz" type="hinge" pos="0 0 0" axis="0 0 1" damping="10" frictionloss="1"/>-->
-        <joint type="free"/>
+        <joint type="free" name="root"/>
         <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
-        <!--<inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />-->
         <body name="base_link" pos="0 0 0">
             <body name="base_chassis_link" pos="0 0 0.160568">
                 <inertial pos="0 0 0.202" mass="101.033" diaginertia="5.38268 5.38268 5.38268" />
@@ -268,8 +263,8 @@
       </body>
     </worldbody>
     <actuator>
-      <velocity joint="left_wheel" name="vel_left_wheel" kv="200"   ctrlrange="-1 1" ctrllimited="true"/>
-      <velocity joint="right_wheel" name="vel_right_wheel" kv="200"   ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="left_wheel" name="vel_left_wheel" kv="250"   ctrlrange="-1 1" ctrllimited="true"/>
+      <velocity joint="right_wheel" name="vel_right_wheel" kv="250"   ctrlrange="-1 1" ctrllimited="true"/>
 
       <!--<motor joint="left_wheel" name="vel_left_wheel"   ctrlrange="-1 1" ctrllimited="true"/>
       <motor joint="right_wheel" name="vel_right_wheel" ctrlrange="-1 1" ctrllimited="true"/>-->

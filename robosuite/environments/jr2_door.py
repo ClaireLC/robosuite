@@ -25,8 +25,6 @@ class JR2Door(JR2Env):
         door_type="dpnl",
         door_pos = [1.3,-0.05,1.0],
         door_quat = [1, 0, 0, -1],
-        arena="e",
-        robot_pos=[0,0,0],
         dist_to_handle_coef=1.0,
         door_angle_coef=1.0,
         handle_con_coef=1.0,
@@ -55,10 +53,6 @@ class JR2Door(JR2Env):
    
             door_quat ([w,x,y,z]): quaternion of door
 
-            arena (str): empty or room
-
-            robot_pos ([x,y,x]): position of robot
-  
             dist_to_handle_coef: reward coefficient for eef distance to handle
 
             door_angle_coef: reward coefficient for angle of door
@@ -87,8 +81,6 @@ class JR2Door(JR2Env):
 
         self.door_pos = door_pos
         self.door_quat = door_quat
-        self.robot_pos = robot_pos
-        self.arena = arena
 
         # Door hinge initial pos
         self.door_init_qpos = np.array([door_init_qpos])
@@ -122,15 +114,11 @@ class JR2Door(JR2Env):
         Loads the arena and pot object.
         """
         super()._load_model()
-        self.mujoco_robot.set_base_xpos(self.robot_pos)
+        self.mujoco_robot.set_base_xpos([0,0,0])
 
         # load model for table top workspace
         self.model = MujocoWorldBase()
-        if (self.arena == "e"):
-          self.mujoco_arena = EmptyArena()
-
-        if self.use_indicator_object:
-            self.mujoco_arena.add_pos_indicator()
+        self.mujoco_arena = EmptyArena()
         
         self.model = DoorTask(
           self.mujoco_arena,
@@ -150,9 +138,15 @@ class JR2Door(JR2Env):
         self.door_body_id = self.sim.model.body_name2id("door")
         self.door_latch_id = self.sim.model.body_name2id("latch")
         self.door_handle_site_id = self.sim.model.site_name2id("door_handle")
-        self.door_hinge_joint_id = self.sim.model.joint_name2id("door_hinge")
+        self.door_hinge_joint_id = self.sim.model.get_joint_qpos_addr("door_hinge")
         self.door_center_site_id = self.sim.model.site_name2id("door_center")
+  
+        # Test prints
         #print(self.sim.model.body_names)
+        #body_ids = [ self.sim.model.body_name2id(x) for x in self.sim.model.body_names]
+        #print(body_ids)
+        #joint_ids = [ self.sim.model.get_joint_q(x) for x in self.sim.model.joint_names]
+        #print(joint_ids)
       
         # Wall references, if there are walls
         if (self.door_type == "dpnlr"):
@@ -169,6 +163,7 @@ class JR2Door(JR2Env):
         
         # Reset door hinge angle
         self.sim.data.qpos[self.door_hinge_joint_id] = self.door_init_qpos
+        print(self.door_hinge_joint_id)
 
     def reward(self, action):
         """
@@ -184,12 +179,12 @@ class JR2Door(JR2Env):
         # Angle of door body (in door object frame)
         door_hinge_angle = self._door_hinge_pos
 
-        # Penalize self contacts (arm with body)
-        self_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms,self.mujoco_robot.body_contact_geoms) 
+        # Penalize self contacts (arm and eef with body)
+        self_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms+self.mujoco_robot.gripper_contact_geoms,self.mujoco_robot.body_contact_geoms) 
         self_con_num = len(list(self_con)) > 0
         #print(self_con_num)
 
-        # Contact with door handle
+        # eef contact with door handle
         door_handle_con = self.find_contacts(self.mujoco_robot.gripper_contact_geoms,self.mujoco_objects["Door"].handle_contact_geoms)
         door_handle_con_num = len(list(door_handle_con)) > 0
         #print("eef handle con num {}".format(door_handle_con_num))
@@ -231,13 +226,7 @@ class JR2Door(JR2Env):
         #print("handle xpos: {}".format(self._door_handle_xpos))
 
         # Reward for going through door
-        # For now, this is hard-coded to the robot and door positions in this env
-        # Todo: generalize
-        # We want robot to always be aligned with ypos of door
-        y_dist = abs(self.robot_base_pos[1] - self._door_center_pos[1])
-        x_diff = self.robot_base_pos[0] - self._door_center_pos[0]
         base_to_door_dist = np.linalg.norm(self.robot_base_pos[0:2] - self._door_center_pos[0:2])
-        #rew_dist_to_door = (x_diff - np.tanh(y_dist)) * self.dist_to_door_coef
         rew_dist_to_door = self.dist_to_door_coef * (1 - np.tanh(base_to_door_dist))
 
         # Check contact with walls
@@ -248,7 +237,7 @@ class JR2Door(JR2Env):
         else:
           rew_wall_con = 0.0
 
-        rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(5*distance_to_handle))
+        rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
         rew_door_angle     = self.door_angle_coef * door_hinge_angle
         rew_handle_con     = self.handle_con_coef * door_handle_con_num
         rew_body_door_con  = self.body_door_con_coef * body_door_con_num
@@ -261,7 +250,7 @@ class JR2Door(JR2Env):
 
         if self.debug_print:
           print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con,rew_gripper_touch))
-          print("REW: dist_to_door: {}, x_rew: {}, y_rew: {}".format(rew_dist_to_door,x_diff,y_dist))
+          print("REW: dist_to_door: {}".format(rew_dist_to_door))
           print("total reward: {}".format(reward))
 
         return reward
@@ -327,52 +316,41 @@ class JR2Door(JR2Env):
           # position and rotation of object in world frame
           door_pos = self.sim.data.body_xpos[self.door_body_id]
           door_quat = T.convert_quat(self.sim.data.body_xquat[self.door_body_id], to="xyzw")
-          #print("door pos: {}".format(door_quat))
+          #print("door pos: {}".format(door_pos))
 
-          di["door_pos"] = door_pos
+          #di["door_pos"] = door_pos[0:2]
           #di["door_quat"] = door_quat
-          di["door_quat"] = np.array([self._door_hinge_pos])
+          di["hinge_theta"] = np.array([self._door_hinge_pos])
           di["door_handle_pos"] = self._door_handle_xpos 
-          di["handle_quat"] =  self._door_latch_xquat
-          di["door_center_pos"] = self._door_center_pos
+          #di["handle_quat"] =  self._door_latch_xquat
+          di["door_center_pos"] = self._door_center_pos[0:2]
           #print(di["handle_quat"])
 
-          # If JR has gripper, check touch sensor in gripper
+          # If JR has gripper, check touch sensor in gripper and add to observation
           if self.eef_type == "gripper":
             if self._gripper_touch_measurement>0:
               di["gripper_touch"] = np.array([1])
               #print("object state obs {}".format(di["gripper_touch"]))
             else:
               di["gripper_touch"] = np.array([0])
-          else:
-              di["gripper_touch"] = np.array([0])
-    
 
-          # If there is are walls, wall information:
-          if (self.door_type == "dpnlr"):
-            wall_pos_list = []
-            for wall_id in self.wall_geom_id:
-              wall_pos_list.append(self.sim.data.geom_xpos[wall_id][0:2])
-            di["wall_pos"] = np.array(wall_pos_list).flatten()
             di["object_state"] = np.concatenate(
               [
-                di["door_pos"],
-                di["door_quat"],
+                #di["door_pos"],
+                di["hinge_theta"],
                 di["door_handle_pos"],
-                di["handle_quat"],
+                #di["handle_quat"],
                 di["gripper_touch"],
                 di["door_center_pos"],
-                di["wall_pos"],
               ]
             )
           else:
             di["object_state"] = np.concatenate(
               [
-                di["door_pos"],
-                di["door_quat"],
+                #di["door_pos"],
+                di["hinge_theta"],
                 di["door_handle_pos"],
-                di["handle_quat"],
-                di["gripper_touch"],
+                #di["handle_quat"],
                 di["door_center_pos"],
               ]
             )

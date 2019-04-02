@@ -56,27 +56,6 @@ class JR2StaticArm(Robot):
         return pos
 
     @property
-    def init_base_qpos(self):
-        # extended arm 
-        #pos = np.array([0.34949709,-0.04287794,-0.05925259])
-
-        # bent arm
-        #pos = np.array([0.41930806,-0.08380221,-0.05922402])
-
-        # arm turned in
-        #pos = np.array([0.49817695,-0.23219606,-0.07514742])
-
-        # angled body
-        #pos = np.array([0.48012223,-0.52841338,0.32938552])
-
-        # 45 degree body
-        #pos = np.array([0.41899952,-0.3610791,0.85207989])
-
-        pos = np.zeros(2)
-
-        return pos
-    
-    @property
     def visualization_sites(self):
         return ["r_grip_site",]
 

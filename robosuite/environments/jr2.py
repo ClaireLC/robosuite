@@ -18,7 +18,7 @@ class JR2Env(MujocoEnv):
         rescale_actions=True,
         bot_motion="mmp",
         reset_on_large_force=False,
-        init_distance=None,
+        robot_pos=[0,0,0],
         eef_type="gripper",
         **kwargs
     ):
@@ -69,7 +69,7 @@ class JR2Env(MujocoEnv):
         self.bot_motion = bot_motion
         self.large_force = False
         self.reset_on_large_force = reset_on_large_force
-        self.init_distance = init_distance
+        self.init_robot_pos = robot_pos
         self.eef_type = eef_type
         super().__init__(**kwargs)
 
@@ -89,11 +89,15 @@ class JR2Env(MujocoEnv):
         """Resets the pose of the arm and grippers."""
         if self.debug_print:
           print("\nRESETTING ENVIRONMENT")
-
         super()._reset_internal()
+      
+        # Reset position and angle of base 
+        self.sim.data.qpos[self._ref_free_joint_pos_indexes[0:3]] = self.init_robot_pos
+        self.sim.data.qpos[self._ref_free_joint_pos_indexes[3:7]] = [1, 0, 0, 0]
+
         if self.eef_type == "static":
           # Reset base and arm 
-          self.sim.data.qpos[self._ref_base_joint_pos_indexes] = self.mujoco_robot.init_base_qpos
+          #self.sim.data.qpos[0:7] = self.mujoco_robot.init_base_qpos
           self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
           self.large_force = False
         else:
@@ -104,80 +108,36 @@ class JR2Env(MujocoEnv):
         """Sets up references for robots, grippers, and objects."""
         super()._get_reference()
 
-        # If robot has static arm:
-        if self.eef_type == "static":
-          # indices for joints in qpos, qvel
-          self.robot_base_joints = list(self.mujoco_robot.base_joints)
-          self.robot_arm_joints = list(self.mujoco_robot.arm_joints)
+        self._ref_free_joint_pos_indexes = np.linspace(self.sim.model.get_joint_qpos_addr("root")[0],self.sim.model.get_joint_qpos_addr("root")[1]-1,self.sim.model.get_joint_qpos_addr("root")[1]-self.sim.model.get_joint_qpos_addr("root")[0]).astype(int)
+        
+        self._ref_free_joint_vel_indexes = np.linspace(self.sim.model.get_joint_qvel_addr("root")[0],self.sim.model.get_joint_qvel_addr("root")[1]-1,self.sim.model.get_joint_qvel_addr("root")[1]-self.sim.model.get_joint_qvel_addr("root")[0]).astype(int)
+      
+        # indices for base and arm joint qpos and qvel
+        self.robot_base_joints = list(self.mujoco_robot.base_joints)
+        self.robot_arm_joints = list(self.mujoco_robot.arm_joints)
 
-          self._ref_base_joint_pos_indexes = [
-              self.sim.model.get_joint_qpos_addr(x) for x in self.robot_base_joints
-          ]
-          self._ref_base_joint_vel_indexes = [
-              self.sim.model.get_joint_qvel_addr(x) for x in self.robot_base_joints
-          ]
-          self._ref_arm_joint_pos_indexes = [
-              self.sim.model.get_joint_qpos_addr(x) for x in self.robot_arm_joints
-          ]
-          self._ref_arm_joint_vel_indexes = [
-              self.sim.model.get_joint_qvel_addr(x) for x in self.robot_arm_joints
-          ]
+        self._ref_base_joint_pos_indexes = [
+            self.sim.model.get_joint_qpos_addr(x) for x in self.robot_base_joints
+        ]
+        self._ref_base_joint_vel_indexes = [
+            self.sim.model.get_joint_qvel_addr(x) for x in self.robot_base_joints
+        ]
+        self._ref_arm_joint_pos_indexes = [
+            self.sim.model.get_joint_qpos_addr(x) for x in self.robot_arm_joints
+        ]
+        self._ref_arm_joint_vel_indexes = [
+            self.sim.model.get_joint_qvel_addr(x) for x in self.robot_arm_joints
+        ]
 
-          # indices for joint pos actuation, joint vel actuation, gripper actuation
-          self._ref_joint_pos_actuator_indexes = [
-              self.sim.model.actuator_name2id(actuator)
-              for actuator in self.sim.model.actuator_names
-              if actuator.startswith("pos")
-          ]
-
-          self._ref_joint_vel_actuator_indexes = [
-              self.sim.model.actuator_name2id(actuator)
-              for actuator in self.sim.model.actuator_names
-              if actuator.startswith("vel")
-          ]
-    
-          self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
-
-        else:
-          # Indices for joints in qpos, qvel
-          self.robot_joints = list(self.mujoco_robot.joints)
-          #print(self.robot_joints)
-          self._ref_joint_pos_indexes = [
-              self.sim.model.get_joint_qpos_addr(x) for x in self.robot_joints
-          ]
-          self._ref_joint_vel_indexes = [
-              self.sim.model.get_joint_qvel_addr(x) for x in self.robot_joints
-          ]
-          if self.use_indicator_object:
-              ind_qpos = self.sim.model.get_joint_qpos_addr("pos_indicator")
-              self._ref_indicator_pos_low, self._ref_indicator_pos_high = ind_qpos
-
-              ind_qvel = self.sim.model.get_joint_qvel_addr("pos_indicator")
-              self._ref_indicator_vel_low, self._ref_indicator_vel_high = ind_qvel
-
-              self.indicator_id = self.sim.model.body_name2id("pos_indicator")
-
-          # Indices for joint pos actuation, joint vel actuation, gripper actuation
-          self._ref_joint_pos_actuator_indexes = [
-              self.sim.model.actuator_name2id(actuator)
-              for actuator in self.sim.model.actuator_names
-              if actuator.startswith("pos")
-          ]
-
-          self._ref_joint_vel_actuator_indexes = [
-              self.sim.model.actuator_name2id(actuator)
-              for actuator in self.sim.model.actuator_names
-              if actuator.startswith("vel")
-          ]
-
-          self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
-
-    def move_indicator(self, pos):
-        """Moves the position of the indicator object to @pos."""
-        if self.use_indicator_object:
-            self.sim.data.qpos[
-                self._ref_indicator_pos_low : self._ref_indicator_pos_low + 3
-            ] = pos
+        self._ref_joint_vel_actuator_indexes = [
+            self.sim.model.actuator_name2id(actuator)
+            for actuator in self.sim.model.actuator_names
+            if actuator.startswith("vel")
+        ]
+        self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
+ 
+        print(self._ref_arm_joint_pos_indexes)
+        print(self._ref_base_joint_pos_indexes)
 
     # Note: Overrides super
     def _pre_action(self, action):
@@ -189,35 +149,27 @@ class JR2Env(MujocoEnv):
         print("\nRobot pre_action info")
         print("Policy action {}".format(new_action))
 
-      if self.eef_type == "static":
-        if self.rescale_actions:
-            # rescale normalized action to control ranges
-            ctrl_range = self.sim.model.actuator_ctrlrange
-            bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
-            weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
-            applied_action = bias + weight * new_action
-        
-            # Clip
-            new_action = np.clip(new_action, -1, 1)
-        else:
-            applied_action = new_action
+      # Scale and clip the policy actions, while preserving Gaussian shape
+      if self.rescale_actions:
+          # Scale normalized action to control ranges
+          ctrl_range = self.sim.model.actuator_ctrlrange
+          bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
+          weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
+          applied_action = bias + weight * new_action
+      
+          # Clip
+          new_action = np.clip(new_action, -1, 1)
+      else:
+          applied_action = new_action
 
+      # If arm is only static, keep the arm joints at zero velocity
+      if self.eef_type == "static":
         #self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
         self.sim.data.qvel[self._ref_arm_joint_vel_indexes] = 0.0
-        print("applied action {}".format(applied_action))
-        #print("set qvels {},{},{}".format(new_velx,new_vely,new_veltheta))
-        print("actual qvels {}".format(self.sim.data.qvel[self._ref_base_joint_vel_indexes]))
         self.sim.data.ctrl[:] = applied_action
-
-        # gravity compensation
-        self.sim.data.qfrc_applied[
-            self._ref_arm_joint_vel_indexes
-        ] = self.sim.data.qfrc_bias[self._ref_arm_joint_vel_indexes]
-        self.sim.data.qfrc_applied[
-            self._ref_base_joint_vel_indexes
-        ] = self.sim.data.qfrc_bias[self._ref_base_joint_vel_indexes]
       else:
         # If JR has a binary gripper, process the fingers' actions
+        # Add an additional value to the end of action, for the second finger
         if self.eef_type == "gripper":
           new_action.append(action[8])
           # gripper state: 1 is open, -1 is closed
@@ -237,63 +189,30 @@ class JR2Env(MujocoEnv):
           #  self.sim.data.qpos[10] = 0.638
           #  self.sim.data.qpos[9] = 0.638
 
-        # Optionally (and by default) rescale actions to [-1, 1]. Not desirable
-        # for certain controllers. They later get normalized to the control range.
-        if self.rescale_actions:
-            new_action = np.clip(new_action, -1, 1)
-
-        if self.rescale_actions:
-            # rescale normalized action to control ranges
-            ctrl_range = self.sim.model.actuator_ctrlrange
-            bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
-            weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
-            applied_action = bias + weight * new_action
-        else:
-            applied_action = new_action
-
-        if self.debug_print:
-          print("theta: {}".format(self.theta_w))
-          print("robot x vel:{}".format(velx_robot))
-          print("robot y vel:{}".format(vely_robot))
-          print("world x vel:{}".format(velx_w))
-          print("world y vel:{}".format(vely_w))
-          print("world wz vel:{}".format(self.sim.data.qvel[self._rootwz_ind]))
-
         if (self.bot_motion == "static"):
           self.sim.data.qvel[0] = 0.0
           self.sim.data.qvel[1] = 0.0
           self.sim.data.qvel[2] = 0.0
-        else:
-          action_scale = 0.05
-          new_velx = weight[self._rootx_ind] * applied_action[self._rootx_ind] * action_scale
-          new_vely = weight[self._rooty_ind] * applied_action[self._rooty_ind] * action_scale
-          new_veltheta = weight[self._rootwz_ind] * applied_action[self._rootwz_ind] * action_scale
-          self.sim.data.qvel[self._rootx_ind] = new_velx
-          self.sim.data.qvel[self._rooty_ind] = new_vely
-          self.sim.data.qvel[self._rootwz_ind] = new_veltheta
-          #print("robot y vel:{}".format(vely_robot))
-          if (abs(vely_robot) > 0.001):
-            if self.debug_print:
-              print("SLIPPING robot y vel:{}".format(vely_robot))
-            self.sim.data.qpos[self._rooty_ind] = self.prev_base_y_pos
-          else:
-            self.prev_base_y_pos = self.sim.data.qpos[self._rooty_ind]
 
-        # Set x,y velocity commands to 0, to solve the problem of sliding base
-        applied_action[self._rootx_ind] = 0.0
-        applied_action[self._rooty_ind] = 0.0
-        applied_action[self._rootwz_ind] = 0.0
+      applied_action[0] = applied_action[0] * 1
+      applied_action[1] = applied_action[1] * 1
 
-        if self.debug_print:
-          print("applied action {}".format(applied_action))
-        #print("set qvels {},{},{}".format(new_velx,new_vely,new_veltheta))
-          print("actual qvels {}".format(self.sim.data.qvel[self._ref_joint_vel_indexes]))
-        self.sim.data.ctrl[:] = applied_action
+      # Apply the action
+      self.sim.data.ctrl[:] = applied_action
 
-        # gravity compensation
-        self.sim.data.qfrc_applied[
-            self._ref_joint_vel_indexes
-        ] = self.sim.data.qfrc_bias[self._ref_joint_vel_indexes]
+      if self.debug_print:
+        print("applied action {}".format(applied_action))
+        print("actual base qvels {}".format(self.sim.data.qvel[self._ref_base_joint_vel_indexes]))
+        print("actual arm qvels {}".format(self.sim.data.qvel[self._ref_arm_joint_vel_indexes]))
+        print("entire qvel {}".format(self.sim.data.qvel)) 
+
+      # gravity compensation
+      self.sim.data.qfrc_applied[
+          self._ref_arm_joint_vel_indexes
+      ] = self.sim.data.qfrc_bias[self._ref_arm_joint_vel_indexes]
+      self.sim.data.qfrc_applied[
+          self._ref_base_joint_vel_indexes
+      ] = self.sim.data.qfrc_bias[self._ref_base_joint_vel_indexes]
 
     def _post_action(self, action):
         """Optionally performs gripper visualization after the actions."""
@@ -317,33 +236,41 @@ class JR2Env(MujocoEnv):
         di = super()._get_observation()
         self._check_contact()
 
-        # proprioceptive features
-        if self.eef_type == "static":
-          di["joint_pos"] = np.array(
-              [self.sim.data.qpos[x] for x in self._ref_base_joint_pos_indexes]
-          )
-          di["joint_vel"] = np.array(
-              [self.sim.data.qvel[x] for x in self._ref_base_joint_vel_indexes]
-          )
-        else:
-          di["joint_pos"] = np.array(
-              [self.sim.data.qpos[x] for x in self._ref_joint_pos_indexes]
-          )
-          di["joint_vel"] = np.array(
-              [self.sim.data.qvel[x] for x in self._ref_joint_vel_indexes]
-          )
+        di["base_pos"] = self.robot_base_pos.flatten()
+        di["base_theta"] = self.robot_base_theta.flatten()
+
+        di["base_vel"] = np.array([self.sim.data.qvel[x] for x in self._ref_free_joint_vel_indexes[0:2]] + [self.sim.data.qvel[self._ref_free_joint_vel_indexes[5]]])
+        #di["base_vel_old"] = np.array([self.sim.data.qvel[x] for x in range(7)])
+
+        # Arm joint info
+        di["arm_joint_pos"] = np.array(
+            [self.sim.data.qpos[x] for x in self._ref_arm_joint_pos_indexes]
+        )
+        di["arm_joint_vel"] = np.array(
+            [self.sim.data.qvel[x] for x in self._ref_arm_joint_vel_indexes]
+        )
+
+        # Wheel velocities
+        di["wheel_joint_vel"] = np.array(
+            [self.sim.data.qvel[x] for x in self._ref_base_joint_vel_indexes]
+        )
+
         di["r_eef_xpos"] = self._r_eef_xpos
         di["r_eef_xquat"] = self._r_eef_xquat
-        di["robot_base_pos"] = self.robot_base_pos
-        di["robot_base_theta"] = self.robot_base_theta
+        #di["robot_base_pos"] = self.robot_base_pos
+        #di["robot_base_theta"] = self.robot_base_theta
   
         robot_states = [
-            di["joint_pos"],
-            di["joint_vel"],
+            di["base_pos"],
+            di["base_theta"],
+            di["base_vel"],
+            di["arm_joint_pos"],
+            di["arm_joint_vel"],
+            di["wheel_joint_vel"],
             di["r_eef_xpos"],
-            di["robot_base_pos"],
+            di["r_eef_xquat"],
         ]
-  
+    
         di["robot-state"] = np.concatenate(robot_states)
         
         if self.debug_print:

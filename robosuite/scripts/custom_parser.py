@@ -25,7 +25,6 @@ def custom_arg_parser():
   parser.add_argument("--bot_motion", help="Type of robot motion (static or mobile base)", type=str, choices=['static','mmp'])
   parser.add_argument("--eef_type", help="End effector type", type=str, choices=['hook','gripper','static'])
   parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl','dpnlr'])
-  parser.add_argument("--arena", help="Arena type, either empty or room", type=str, choices=['e','r'])
   parser.add_argument("--distance", help="Distance from robot to door", type=str)
   parser.add_argument("--robot_pos", help="Position of door [x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_pos", help="Position of door [x,y,z]", nargs='+', type=float)
@@ -98,12 +97,11 @@ def serialize_args(args):
     if key == "config_file": continue
     if key == "device": continue
     if key == "replay": continue
-    if key == "arena": continue
-    if key == "robot_pos": continue
     if key == "door_pos": continue
     if key == "door_quat": continue
     if key == "print_info": continue
     if key == "control_freq": continue
+    if key == "bot_motion": continue
 
     # Necessary to deal with length
     splits = key.split('_')

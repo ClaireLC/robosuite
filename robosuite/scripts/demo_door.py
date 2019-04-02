@@ -33,7 +33,6 @@ if __name__ == "__main__":
       wall_con_coef       = args.rcoef_wall_con,
       reset_on_large_force= args.reset_on_large_force,
       debug_print         = args.print_info,
-      init_distance       = args.distance,
       eef_type            = args.eef_type,
       door_init_qpos      = args.door_init_qpos,
   )
@@ -50,7 +49,7 @@ if __name__ == "__main__":
     
   while True:
     action_vel[0] = 0
-    action_vel[1] = 1.0
+    action_vel[1] = 0
     if args.eef_type == "gripper":
       action_vel[8] = 0
     obs, reward, done, _ = env.step(action_vel)

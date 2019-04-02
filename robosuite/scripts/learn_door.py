@@ -51,7 +51,6 @@ def main():
       control_freq        = args.control_freq,
       horizon             = args.horizon,
       door_type           = args.door_type,
-      arena               = args.arena,
       bot_motion          = args.bot_motion,
       robot_pos           = args.robot_pos,
       dist_to_handle_coef = args.rcoef_dist_to_handle,
@@ -67,7 +66,6 @@ def main():
       wall_con_coef       = args.rcoef_wall_con,
       reset_on_large_force= args.reset_on_large_force,
       debug_print         = args.print_info,
-      init_distance       = args.distance,
       eef_type            = args.eef_type,
       door_init_qpos      = args.door_init_qpos,
     )
