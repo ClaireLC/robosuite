@@ -265,9 +265,6 @@
     <actuator>
       <velocity joint="left_wheel" name="vel_left_wheel" kv="250"   ctrlrange="-1 1" ctrllimited="true"/>
       <velocity joint="right_wheel" name="vel_right_wheel" kv="250"   ctrlrange="-1 1" ctrllimited="true"/>
-
-      <!--<motor joint="left_wheel" name="vel_left_wheel"   ctrlrange="-1 1" ctrllimited="true"/>
-      <motor joint="right_wheel" name="vel_right_wheel" ctrlrange="-1 1" ctrllimited="true"/>-->
     </actuator>
     <sensor>
       <force name="force_ee" site="ft_frame"/>

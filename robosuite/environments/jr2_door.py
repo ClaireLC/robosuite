@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import numpy as np
 import time
+import pprint
 
 import robosuite.utils.transform_utils as T
 from robosuite.environments.baxter import BaxterEnv
@@ -245,13 +246,34 @@ class JR2Door(JR2Env):
         rew_arm_door_con   = self.arm_door_con_coef * arm_door_con_num
         #print(self.arm_handle_con_coef)
 
-        reward = rew_dist_to_handle + rew_door_angle + rew_handle_con + rew_body_door_con + rew_self_con + rew_eef_force + rew_arm_door_con + rew_gripper_touch + rew_dist_to_door + rew_wall_con + rew_arm_handle_con
+        reward = (rew_dist_to_handle + 
+                  rew_door_angle + 
+                  rew_handle_con + 
+                  rew_body_door_con + 
+                  rew_self_con + 
+                  rew_eef_force + 
+                  rew_arm_door_con +  
+                  rew_gripper_touch + 
+                  rew_dist_to_door + 
+                  rew_wall_con + 
+                  rew_arm_handle_con)
 
         if self.debug_print:
-          print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con,rew_gripper_touch))
-          print("REW: dist_to_door: {}".format(rew_dist_to_door))
-          print("Dist_to_door: {}".format(base_to_door_dist))
-          print("total reward: {}".format(reward))
+          print("TOTAL REWARD:       {}".format(reward))
+          print("rew_dist_to_handle: {}".format(rew_dist_to_handle))
+          print("rew_door_angle:     {}".format(rew_door_angle))
+          print("rew_handle_con:     {}".format(rew_handle_con))
+          print("body_door_con:  {}".format(body_door_con_num))
+          print("arm_door_con:   {}".format(arm_door_con_num))
+          print("rew_body_door_con:  {}".format(rew_body_door_con))
+          print("rew_arm_door_con:   {}".format(rew_arm_door_con))
+          print("rew_arm_handle_con: {}".format(rew_arm_handle_con))
+          print("rew_self_con:       {}".format(rew_self_con))
+          print("rew_wall_con:       {}".format(rew_wall_con))
+          print("rew_eef_force:      {}".format(rew_eef_force))
+          print("rew_gripper_touch:  {}".format(rew_gripper_touch))
+          print("rew_dist_to_door:   {}".format(rew_dist_to_door))
+          print("distance to door:   {}".format(base_to_door_dist))
 
         return reward
     
@@ -323,7 +345,7 @@ class JR2Door(JR2Env):
           di["hinge_theta"] = np.array([self._door_hinge_pos])
           di["door_handle_pos"] = self._door_handle_xpos 
           #di["handle_quat"] =  self._door_latch_xquat
-          di["door_center_pos"] = self._door_center_pos[0:2]
+          di["goal_pos"] = self._door_center_pos[0:2]
           #print(di["handle_quat"])
 
           # If JR has gripper, check touch sensor in gripper and add to observation
@@ -341,7 +363,7 @@ class JR2Door(JR2Env):
                 di["door_handle_pos"],
                 #di["handle_quat"],
                 di["gripper_touch"],
-                di["door_center_pos"],
+                di["goal_pos"],
               ]
             )
           else:
@@ -351,11 +373,14 @@ class JR2Door(JR2Env):
                 di["hinge_theta"],
                 di["door_handle_pos"],
                 #di["handle_quat"],
-                di["door_center_pos"],
+                di["goal_pos"],
               ]
             )
 
-        #print("obs: {}".format(di))
+        if self.debug_print:
+          pp = pprint.PrettyPrinter(indent=1)
+          print("Observation")
+          pp.pprint(di)
         return di
 
     def _check_contact(self):
