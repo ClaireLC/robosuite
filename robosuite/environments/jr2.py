@@ -100,14 +100,14 @@ class JR2Env(MujocoEnv):
         self.sim.data.qpos[self._ref_free_joint_pos_indexes[0:3]] = self.init_robot_pos
         self.sim.data.qpos[self._ref_free_joint_pos_indexes[3:7]] = [qw, 0, 0, qz]
 
-        if self.eef_type == "static":
-          # Reset base and arm 
-          #self.sim.data.qpos[0:7] = self.mujoco_robot.init_base_qpos
-          self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
-          self.large_force = False
-        else:
-          self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos(self.init_distance)
-          self.large_force = False
+        #if self.eef_type == "static":
+        # Reset arm 
+        #self.sim.data.qpos[0:7] = self.mujoco_robot.init_base_qpos
+        self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
+        self.large_force = False
+        #else:
+        #  self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos(self.init_distance)
+        #  self.large_force = False
 
     def _get_reference(self):
         """Sets up references for robots, grippers, and objects."""
@@ -148,8 +148,30 @@ class JR2Env(MujocoEnv):
       # Copy the action to a list
       new_action = action.copy().tolist()
       if self.debug_print:
-        print("\nRobot pre_action info")
+        print("\nTimestep: {}".format(self.timestep))
+        print("Robot pre_action info")
         print("Policy action {}".format(new_action))
+
+      # If JR has a binary gripper, process the fingers' actions
+      # Add an additional value to the end of action, for the second finger
+      if self.eef_type == "gripper":
+        new_action.append(action[8])
+        # gripper state: 1 is open, -1 is closed
+        #gripper_state = action[8]
+        #if action[8] == 0:
+        #  is_open = True
+        #else:
+        #  is_open = False
+        #action[8] = 0.0
+        #new_action.append(0.0)
+
+        # set position of gripper
+        #if is_open:
+        #  self.sim.data.qpos[10] = 0.0
+        #  self.sim.data.qpos[9] = 0.0
+        #else:
+        #  self.sim.data.qpos[10] = 0.638
+        #  self.sim.data.qpos[9] = 0.638
 
       # Scale and clip the policy actions, while preserving Gaussian shape
       if self.rescale_actions:
@@ -170,27 +192,6 @@ class JR2Env(MujocoEnv):
         self.sim.data.qvel[self._ref_arm_joint_vel_indexes] = 0.0
         self.sim.data.ctrl[:] = applied_action
       else:
-        # If JR has a binary gripper, process the fingers' actions
-        # Add an additional value to the end of action, for the second finger
-        if self.eef_type == "gripper":
-          new_action.append(action[8])
-          # gripper state: 1 is open, -1 is closed
-          #gripper_state = action[8]
-          #if action[8] == 0:
-          #  is_open = True
-          #else:
-          #  is_open = False
-          #action[8] = 0.0
-          #new_action.append(0.0)
-
-          # set position of gripper
-          #if is_open:
-          #  self.sim.data.qpos[10] = 0.0
-          #  self.sim.data.qpos[9] = 0.0
-          #else:
-          #  self.sim.data.qpos[10] = 0.638
-          #  self.sim.data.qpos[9] = 0.638
-
         if (self.bot_motion == "static"):
           self.sim.data.qvel[0] = 0.0
           self.sim.data.qvel[1] = 0.0
@@ -258,7 +259,7 @@ class JR2Env(MujocoEnv):
         )
 
         di["r_eef_xpos"] = self._r_eef_xpos
-        di["r_eef_xquat"] = self._r_eef_xquat
+        #di["r_eef_xquat"] = self._r_eef_xquat
         #di["robot_base_pos"] = self.robot_base_pos
         #di["robot_base_theta"] = self.robot_base_theta
   
@@ -270,7 +271,7 @@ class JR2Env(MujocoEnv):
             di["arm_joint_vel"],
             di["wheel_joint_vel"],
             di["r_eef_xpos"],
-            di["r_eef_xquat"],
+            #di["r_eef_xquat"],
         ]
     
         di["robot-state"] = np.concatenate(robot_states)
