@@ -163,7 +163,6 @@ class JR2Door(JR2Env):
         
         # Reset door hinge angle
         self.sim.data.qpos[self.door_hinge_joint_id] = self.door_init_qpos
-        print(self.door_hinge_joint_id)
 
     def reward(self, action):
         """
@@ -251,6 +250,7 @@ class JR2Door(JR2Env):
         if self.debug_print:
           print("(dist_to_handle,door_angle,handle_con,body_door_con,self_con,arm_handle_con,eef_force,arm_door_con)\n({},{},{},{},{},{},{},{},{})".format(rew_dist_to_handle, rew_door_angle,rew_handle_con, rew_body_door_con, rew_self_con,rew_arm_handle_con,rew_eef_force,rew_arm_door_con,rew_gripper_touch))
           print("REW: dist_to_door: {}".format(rew_dist_to_door))
+          print("Dist_to_door: {}".format(base_to_door_dist))
           print("total reward: {}".format(reward))
 
         return reward
@@ -355,7 +355,7 @@ class JR2Door(JR2Env):
               ]
             )
 
-        print("obs: {}".format(di))
+        #print("obs: {}".format(di))
         return di
 
     def _check_contact(self):

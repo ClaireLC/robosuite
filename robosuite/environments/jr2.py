@@ -19,6 +19,7 @@ class JR2Env(MujocoEnv):
         bot_motion="mmp",
         reset_on_large_force=False,
         robot_pos=[0,0,0],
+        robot_theta=0,
         eef_type="gripper",
         **kwargs
     ):
@@ -70,6 +71,7 @@ class JR2Env(MujocoEnv):
         self.large_force = False
         self.reset_on_large_force = reset_on_large_force
         self.init_robot_pos = robot_pos
+        self.init_robot_theta = robot_theta
         self.eef_type = eef_type
         super().__init__(**kwargs)
 
@@ -91,9 +93,12 @@ class JR2Env(MujocoEnv):
           print("\nRESETTING ENVIRONMENT")
         super()._reset_internal()
       
+        # Calculate robot initial quaternion from theta
+        qz = np.sin(self.init_robot_theta/2)
+        qw = np.cos(self.init_robot_theta/2)
         # Reset position and angle of base 
         self.sim.data.qpos[self._ref_free_joint_pos_indexes[0:3]] = self.init_robot_pos
-        self.sim.data.qpos[self._ref_free_joint_pos_indexes[3:7]] = [1, 0, 0, 0]
+        self.sim.data.qpos[self._ref_free_joint_pos_indexes[3:7]] = [qw, 0, 0, qz]
 
         if self.eef_type == "static":
           # Reset base and arm 
@@ -135,9 +140,6 @@ class JR2Env(MujocoEnv):
             if actuator.startswith("vel")
         ]
         self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
- 
-        print(self._ref_arm_joint_pos_indexes)
-        print(self._ref_base_joint_pos_indexes)
 
     # Note: Overrides super
     def _pre_action(self, action):

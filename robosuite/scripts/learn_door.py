@@ -53,6 +53,7 @@ def main():
       door_type           = args.door_type,
       bot_motion          = args.bot_motion,
       robot_pos           = args.robot_pos,
+      robot_theta         = args.robot_theta,
       dist_to_handle_coef = args.rcoef_dist_to_handle,
       door_angle_coef     = args.rcoef_door_angle,
       handle_con_coef     = args.rcoef_handle_con,
