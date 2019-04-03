@@ -259,7 +259,7 @@ class JR2Env(MujocoEnv):
         )
 
         di["r_eef_xpos"] = self._r_eef_xpos
-        #di["r_eef_xquat"] = self._r_eef_xquat
+        di["r_eef_xquat"] = self._r_eef_xquat
         #di["robot_base_pos"] = self.robot_base_pos
         #di["robot_base_theta"] = self.robot_base_theta
   
@@ -271,7 +271,7 @@ class JR2Env(MujocoEnv):
             di["arm_joint_vel"],
             di["wheel_joint_vel"],
             di["r_eef_xpos"],
-            #di["r_eef_xquat"],
+            di["r_eef_xquat"],
         ]
     
         di["robot-state"] = np.concatenate(robot_states)
