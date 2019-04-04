@@ -27,7 +27,7 @@ def custom_arg_parser():
   parser.add_argument("--door_type", help="Door type to use", type=str, choices=['dpnl','dpwl','dpnlr'])
   parser.add_argument("--distance", help="Distance from robot to door", type=str)
   parser.add_argument("--robot_pos", help="Initial position of robot [x,y,z]", nargs='+', type=float)
-  parser.add_argument("--robot_theta", help="Initial angle of robot in radians", nargs='+', type=float)
+  parser.add_argument("--robot_theta", help="Initial angle of robot in radians", type=float)
   parser.add_argument("--door_pos", help="Position of door [x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_quat", help="Position of door [w,x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_init_qpos", help="Initial angle of hinge", type=float)
