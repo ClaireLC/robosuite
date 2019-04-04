@@ -226,7 +226,8 @@ class JR2Door(JR2Env):
         #print("handle xpos: {}".format(self._door_handle_xpos))
 
         # Reward for going through door
-        base_to_door_dist = np.linalg.norm(self.robot_base_pos[0:2] - self._door_center_pos[0:2])
+        #base_to_door_dist = np.linalg.norm(self.robot_base_pos[0:2] - self._door_center_pos[0:2])
+        base_to_door_dist = np.linalg.norm(self.robot_base_offset_pos[0:2] - self._door_center_pos[0:2])
         rew_dist_to_door = self.dist_to_door_coef * (1 - np.tanh(base_to_door_dist))
 
         # Check contact with walls

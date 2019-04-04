@@ -140,6 +140,7 @@ class JR2Env(MujocoEnv):
             if actuator.startswith("vel")
         ]
         self.r_grip_site_id = self.sim.model.site_name2id("r_grip_site")
+        self.base_offset_site_id = self.sim.model.site_name2id("base_offset")
 
     # Note: Overrides super
     def _pre_action(self, action):
@@ -301,6 +302,13 @@ class JR2Env(MujocoEnv):
         rot_in_world = self.sim.data.get_body_xmat("base_footprint").reshape((3, 3))
         pose_in_world = T.make_pose(pos_in_world, rot_in_world)
         return pose_in_world
+
+    @property
+    def robot_base_offset_pos(self):
+        """
+        Base position of robot in world frame
+        """
+        return self.sim.data.site_xpos[self.base_offset_site_id]
 
     @property
     def robot_base_pos(self):
