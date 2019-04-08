@@ -165,6 +165,9 @@ class JR2Door(JR2Env):
         # Reset door hinge angle
         self.sim.data.qpos[self.door_hinge_joint_id] = self.door_init_qpos
 
+        # Reset prev door hinge angle
+        self.door_angle_prev = self.door_init_qpos
+
     def reward(self, action):
         """
         Reward function for the task.
@@ -238,14 +241,22 @@ class JR2Door(JR2Env):
         else:
           rew_wall_con = 0.0
 
+        # New reward for door angle:
+        # negative if door angle is decreased, positive if it is increased
+        door_angle_delta = self._door_hinge_pos - self.door_angle_prev        
+        self.door_angle_prev = self._door_hinge_pos
+        door_angle_delta_sign = np.sign(door_angle_delta)
+
         rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
-        rew_door_angle     = self.door_angle_coef * door_hinge_angle
+        rew_door_angle     = self.door_angle_coef * door_angle_delta_sign
+        #rew_door_angle     = self.door_angle_coef * door_hinge_angle
         rew_handle_con     = self.handle_con_coef * door_handle_con_num
         rew_body_door_con  = self.body_door_con_coef * body_door_con_num
         rew_self_con       = self.self_con_coef * self_con_num
         rew_arm_handle_con = self.arm_handle_con_coef * arm_handle_con_num
         rew_arm_door_con   = self.arm_door_con_coef * arm_door_con_num
         #print(self.arm_handle_con_coef)
+        #print(rew_door_angle)
 
         reward = (rew_dist_to_handle + 
                   rew_door_angle + 
@@ -259,6 +270,7 @@ class JR2Door(JR2Env):
                   rew_wall_con + 
                   rew_arm_handle_con)
 
+        #print("TOTAL REWARD:       {}".format(reward))
         if self.debug_print:
           print("TOTAL REWARD:       {}".format(reward))
           print("rew_dist_to_handle: {}".format(rew_dist_to_handle))
