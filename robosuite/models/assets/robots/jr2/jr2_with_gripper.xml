@@ -37,6 +37,7 @@
 <body name="base_footprint">
         <joint type="free" name="root"/>
         <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+        <site name="base_offset" pos="0.35 0 0" size="0.02" rgba="0 1 0 1" type="sphere" class="site"/>
         <body name="base_link" pos="0 0 0">
             <body name="base_chassis_link" pos="0 0 0.160568">
                 <inertial pos="0 0 0.202" mass="101.033" diaginertia="5.38268 5.38268 5.38268" />
