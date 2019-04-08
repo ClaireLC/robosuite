@@ -246,6 +246,7 @@ class JR2Door(JR2Env):
         door_angle_delta = self._door_hinge_pos - self.door_angle_prev        
         self.door_angle_prev = self._door_hinge_pos
         door_angle_delta_sign = np.sign(door_angle_delta)
+        #print(door_angle_delta_sign.shape)
 
         rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
         rew_door_angle     = self.door_angle_coef * door_angle_delta_sign
@@ -369,7 +370,7 @@ class JR2Door(JR2Env):
             else:
               di["gripper_touch"] = np.array([0])
 
-            di["object_state"] = np.concatenate(
+            di["object-state"] = np.concatenate(
               [
                 #di["door_pos"],
                 di["hinge_theta"],
@@ -380,7 +381,7 @@ class JR2Door(JR2Env):
               ]
             )
           else:
-            di["object_state"] = np.concatenate(
+            di["object-state"] = np.concatenate(
               [
                 #di["door_pos"],
                 di["hinge_theta"],
