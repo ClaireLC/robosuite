@@ -84,7 +84,7 @@ class JR2Door(JR2Env):
         self.door_quat = door_quat
 
         # Door hinge initial pos
-        self.door_init_qpos = np.array([door_init_qpos])
+        self.door_init_qpos = door_init_qpos
 
         # whether to use ground-truth object states
         self.use_object_obs = use_object_obs
@@ -102,6 +102,9 @@ class JR2Door(JR2Env):
         self.gripper_touch_coef = gripper_touch_coef
         self.dist_to_door_coef = dist_to_door_coef
         self.wall_con_coef = wall_con_coef
+
+        # Reset prev door hinge angle
+        self.door_angle_prev = self.door_init_qpos
 
         self.debug_print = debug_print
         print('debug print {}'.format(self.debug_print))
@@ -163,7 +166,7 @@ class JR2Door(JR2Env):
         super()._reset_internal()
         
         # Reset door hinge angle
-        self.sim.data.qpos[self.door_hinge_joint_id] = self.door_init_qpos
+        self.sim.data.qpos[self.door_hinge_joint_id] = np.asarray([self.door_init_qpos])
 
         # Reset prev door hinge angle
         self.door_angle_prev = self.door_init_qpos
@@ -246,7 +249,6 @@ class JR2Door(JR2Env):
         door_angle_delta = self._door_hinge_pos - self.door_angle_prev        
         self.door_angle_prev = self._door_hinge_pos
         door_angle_delta_sign = np.sign(door_angle_delta)
-        #print(door_angle_delta_sign.shape)
 
         rew_dist_to_handle = self.dist_to_handle_coef * (1 - np.tanh(distance_to_handle))
         rew_door_angle     = self.door_angle_coef * door_angle_delta_sign
@@ -257,7 +259,6 @@ class JR2Door(JR2Env):
         rew_arm_handle_con = self.arm_handle_con_coef * arm_handle_con_num
         rew_arm_door_con   = self.arm_door_con_coef * arm_door_con_num
         #print(self.arm_handle_con_coef)
-        #print(rew_door_angle)
 
         reward = (rew_dist_to_handle + 
                   rew_door_angle + 
