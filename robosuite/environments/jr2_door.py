@@ -200,11 +200,13 @@ class JR2Door(JR2Env):
         body_door_con_num = len(list(body_door_con)) > 0
         #print("body door con num {}".format(body_door_con_num))
 
+        # If we want to penalize body door contact,
         # Check for consecutive body to door contacts
-        if body_door_con_num > 0:
-          self.consecutive_body_door_con += 1
-        else:
-          self.consecutive_body_door_con = 0
+        if self.body_door_con_coef < 0:
+          if body_door_con_num > 0:
+            self.consecutive_body_door_con += 1
+          else:
+            self.consecutive_body_door_con = 0
 
         # Arm to door contacts
         arm_door_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms + self.mujoco_robot.gripper_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms)
