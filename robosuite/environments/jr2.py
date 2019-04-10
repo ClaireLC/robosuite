@@ -73,6 +73,11 @@ class JR2Env(MujocoEnv):
         self.init_robot_pos = robot_pos
         self.init_robot_theta = robot_theta
         self.eef_type = eef_type
+
+        self.consecutive_body_door_con = 0
+        self.consecutive_wall_con = 0
+        self.contact_thresh = 10
+
         super().__init__(**kwargs)
 
     def _load_model(self):
@@ -104,7 +109,11 @@ class JR2Env(MujocoEnv):
         # Reset arm 
         #self.sim.data.qpos[0:7] = self.mujoco_robot.init_base_qpos
         self.sim.data.qpos[self._ref_arm_joint_pos_indexes] = self.mujoco_robot.init_arm_qpos
+
+      
         self.large_force = False
+        self.consecutive_body_door_con = 0
+        self.consecutive_wall_con = 0
         #else:
         #  self.sim.data.qpos[self._ref_joint_pos_indexes] = self.mujoco_robot.init_qpos(self.init_distance)
         #  self.large_force = False
@@ -223,10 +232,19 @@ class JR2Env(MujocoEnv):
         #ret = super()._post_action(action)
         reward = self.reward(action)
 
+        # reset after surpassing contact threshold
+        reset_con = self.consecutive_body_door_con > self.contact_thresh or \
+                    self.consecutive_wall_con > self.contact_thresh
+
+        #if self.consecutive_body_door_con > 0 or \
+        #            self.consecutive_wall_con > 0:
+        #  print("Consecutive contacts {} {}".format(self.consecutive_body_door_con \
+        #                                         ,self.consecutive_wall_con))
+
         if self.reset_on_large_force:
-          self.done = ((self.large_force) or (self.timestep >= self.horizon)) and not self.ignore_done 
+          self.done = ((self.large_force) or (self.timestep >= self.horizon) or reset_con) and not self.ignore_done 
         else:
-          self.done = (self.timestep >= self.horizon) and not self.ignore_done 
+          self.done = ((self.timestep >= self.horizon) or reset_con) and not self.ignore_done 
           
         return reward, self.done, {}
 

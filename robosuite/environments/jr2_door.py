@@ -199,7 +199,13 @@ class JR2Door(JR2Env):
         body_door_con = self.find_contacts(self.mujoco_robot.body_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms + self.mujoco_objects["Door"].handle_contact_geoms)
         body_door_con_num = len(list(body_door_con)) > 0
         #print("body door con num {}".format(body_door_con_num))
-  
+
+        # Check for consecutive body to door contacts
+        if body_door_con_num > 0:
+          self.consecutive_body_door_con += 1
+        else:
+          self.consecutive_body_door_con = 0
+
         # Arm to door contacts
         arm_door_con = self.find_contacts(self.mujoco_robot.arm_contact_geoms + self.mujoco_robot.gripper_contact_geoms, self.mujoco_objects["Door"].door_contact_geoms)
         arm_door_con_num = len(list(arm_door_con)) > 0
@@ -241,6 +247,12 @@ class JR2Door(JR2Env):
           wall_con = self.find_contacts(self.mujoco_robot.gripper_contact_geoms + self.mujoco_robot.arm_contact_geoms + self.mujoco_robot.body_contact_geoms, self.mujoco_objects["Door"].wall_contact_geoms)
           wall_con_num = len(list(wall_con)) > 0
           rew_wall_con = self.wall_con_coef * wall_con_num
+
+          # Check for consecutive wall contact
+          if wall_con_num > 0:
+            self.consecutive_wall_con += 1
+          else:
+            self.consecutive_wall_con = 0
         else:
           rew_wall_con = 0.0
 
