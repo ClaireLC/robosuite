@@ -39,6 +39,7 @@ class JR2Door(JR2Env):
         force_coef=0.0,
         debug_print=False,
         door_init_qpos=0.0,
+        goal_offset=[0,0],
         **kwargs
     ):
         """
@@ -63,6 +64,8 @@ class JR2Door(JR2Env):
             body_door_con_coef: reward coefficent to penalize body contact with door
 
             self_con_coef: reward coefficient to penalize self collisions
+
+            arm_handle_con_coef: reward coefficient to penalize collisions with arm and handle
       
             debug_print: True if printing debug information
 
@@ -85,6 +88,9 @@ class JR2Door(JR2Env):
 
         # Door hinge initial pos
         self.door_init_qpos = door_init_qpos
+  
+        # goal position offset from door center
+        self.goal_offset = goal_offset
 
         # whether to use ground-truth object states
         self.use_object_obs = use_object_obs
@@ -119,6 +125,7 @@ class JR2Door(JR2Env):
         """
         super()._load_model()
         self.mujoco_robot.set_base_xpos([0,0,0])
+        self.mujoco_objects["Door"].set_goal_xpos(self.goal_offset[0], self.goal_offset[1])
 
         # load model for table top workspace
         self.model = MujocoWorldBase()
@@ -144,6 +151,7 @@ class JR2Door(JR2Env):
         self.door_handle_site_id = self.sim.model.site_name2id("door_handle")
         self.door_hinge_joint_id = self.sim.model.get_joint_qpos_addr("door_hinge")
         self.door_center_site_id = self.sim.model.site_name2id("door_center")
+        self.goal_site_id = self.sim.model.site_name2id("goal")
   
         # Test prints
         #print(self.sim.model.body_names)
@@ -240,8 +248,7 @@ class JR2Door(JR2Env):
         #print("handle xpos: {}".format(self._door_handle_xpos))
 
         # Reward for going through door
-        #base_to_door_dist = np.linalg.norm(self.robot_base_pos[0:2] - self._door_center_pos[0:2])
-        base_to_door_dist = np.linalg.norm(self.robot_base_offset_pos[0:2] - self._door_center_pos[0:2])
+        base_to_door_dist = np.linalg.norm(self.robot_base_offset_pos[0:2] - self._goal_pos[0:2])
         rew_dist_to_door = self.dist_to_door_coef * (1 - np.tanh(base_to_door_dist))
 
         # Check contact with walls
@@ -287,6 +294,7 @@ class JR2Door(JR2Env):
                   rew_arm_handle_con)
 
         #print("TOTAL REWARD:       {}".format(reward))
+        #print("distance to door:   {}".format(base_to_door_dist))
         if self.debug_print:
           print("TOTAL REWARD:       {}".format(reward))
           print("rew_dist_to_handle: {}".format(rew_dist_to_handle))
@@ -320,6 +328,11 @@ class JR2Door(JR2Env):
     def _door_center_pos(self):
         """ Returns position of door center in world frame """
         return self.sim.data.site_xpos[self.door_center_site_id]
+
+    @property
+    def _goal_pos(self):
+        """ Returns position of door center in world frame """
+        return self.sim.data.site_xpos[self.goal_site_id]
 
     @property
     def _door_latch_xquat(self):
@@ -374,7 +387,7 @@ class JR2Door(JR2Env):
           di["hinge_theta"] = np.array([self._door_hinge_pos])
           di["door_handle_pos"] = self._door_handle_xpos 
           #di["handle_quat"] =  self._door_latch_xquat
-          di["goal_pos"] = self._door_center_pos[0:2]
+          di["goal_pos"] = self._goal_pos[0:2]
           #print(di["handle_quat"])
 
           # If JR has gripper, check touch sensor in gripper and add to observation

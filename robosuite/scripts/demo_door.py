@@ -2,6 +2,8 @@ import argparse
 import robosuite as suite
 import numpy as np
 import time
+import csv
+
 from robosuite.scripts.custom_parser import custom_arg_parser, load_defaults, serialize_args
 
 if __name__ == "__main__":
@@ -17,10 +19,12 @@ if __name__ == "__main__":
       "JR2Door",
       has_renderer=True,
       use_camera_obs=False,
-      ignore_done=True,
+      ignore_done=False,
+      horizon             = args.horizon,
       control_freq=20,
       door_type           = args.door_type,
-      robot_pos=args.robot_pos,
+      robot_pos           = args.robot_pos,
+      robot_theta         = args.robot_theta,
       dist_to_handle_coef = args.rcoef_dist_to_handle,
       door_angle_coef     = args.rcoef_door_angle,
       handle_con_coef     = args.rcoef_handle_con,
@@ -35,6 +39,7 @@ if __name__ == "__main__":
       debug_print         = args.print_info,
       eef_type            = args.eef_type,
       door_init_qpos      = args.door_init_qpos,
+      goal_offset         = args.goal_offset,
   )
   
   env.reset()
@@ -47,13 +52,28 @@ if __name__ == "__main__":
   else:
     action_vel = np.zeros(8)
     
+  reward = 0
   while True:
+    #if 0.95 <= reward <= 1.0:
+    #  action_vel = np.zeros(2)
+    #else:
+    #  action_vel[0] = 0.75
+    #  action_vel[1] = 0.75
     action_vel[0] = 0
     action_vel[1] = 0
+       
     if args.eef_type == "gripper":
       action_vel[8] = 0
     obs, reward, done, _ = env.step(action_vel)
     env.render()
-    #print(reward)
+    
+    #with open('episode-reward.csv', mode='a+') as fid:
+    #  writer = csv.writer(fid, delimiter=',')
+    #  writer.writerow([reward])
+
+    #if done:
+    #  quit()
+
+    print(obs)
     #print(env.sim.data.qpos[env._ref_joint_vel_indexes])
     #time.sleep(0.05)

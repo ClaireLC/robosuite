@@ -4,6 +4,7 @@ import numpy as np
 import time
 import json
 import os
+import csv
 
 import robosuite as suite
 from stable_baselines.common.policies import MlpPolicy,MlpLstmPolicy,MlpLnLstmPolicy
@@ -69,6 +70,7 @@ def main():
       debug_print         = args.print_info,
       eef_type            = args.eef_type,
       door_init_qpos      = args.door_init_qpos,
+      goal_offset         = args.goal_offset,
     )
   )
   
@@ -100,7 +102,8 @@ def main():
                   noptepochs=args.opt_epochs,
                   cliprange=args.clip_range,
                   ent_coef=args.ent_coef,
-                  tensorboard_log=tb_save_path
+                  tensorboard_log=tb_save_path,
+                  #full_tensorboard_log=True
                   )
 
     elif args.rl_alg == "ppo1":
@@ -115,17 +118,31 @@ def main():
   if args.replay:
     # Replay a policy
     obs = env.reset()
+    count = 0
+    with open('episode-reward.csv', mode='w') as fid:
+      writer = csv.writer(fid, delimiter=',')
+      writer.writerow("reward")
+    while(count < 1000):
+      env.render()
+      count += 1
+      print(count)
     while True:
       if args.model is None:
         print("Error: No model has been specified")
-    
-      action, _states = model.predict(obs)
+      action, _states = model.predict(obs,deterministic=True)
       #print("action {}".format(action))
       obs, reward, done, info = env.step(action)
       env.render()
       #print(obs)
       #print(env.sim.data.qpos[env._ref_joint_vel_indexes])
       #time.sleep(0.1)
+
+      with open('episode-reward.csv', mode='a') as fid:
+        writer = csv.writer(fid, delimiter=',')
+        writer.writerow(reward)
+
+      #if done:
+      #  quit()
   else:
     # Train
     model.learn(

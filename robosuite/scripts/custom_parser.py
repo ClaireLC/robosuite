@@ -31,6 +31,7 @@ def custom_arg_parser():
   parser.add_argument("--door_pos", help="Position of door [x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_quat", help="Position of door [w,x,y,z]", nargs='+', type=float)
   parser.add_argument("--door_init_qpos", help="Initial angle of hinge", type=float)
+  parser.add_argument("--goal_offset", help="x and y offset of goal from door center [x,y]", nargs='+', type=float)
   parser.add_argument("--control_freq", help="Control frequency", type=int)
   parser.add_argument("--reset_on_large_force", help="Specifies if environment should reset when robot eef exerts large force", type=str2bool)
 
