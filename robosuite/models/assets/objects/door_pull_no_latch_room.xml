@@ -50,15 +50,15 @@
                     <site name="door_handle" pos="0 -0.15 -0.1" size="0.025" class="site" rgba="1 0 0 1"/>
                 </body>
             </body>
-        <geom size="0.65 0.03 .99" pos="-0.65 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-        <geom size="0.65 0.03 .99" pos="1.55 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-        <geom size="1.0  0.03 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-        <geom size="1.0  0.03 .99" pos="2.2 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+        <geom size="0.65 0.01 .99" pos="-0.65 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+        <geom size="0.65 0.01 .99" pos="1.55 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+        <geom size="1.0  0.01 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+        <geom size="1.0  0.01 .99" pos="2.2 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
 
-        <geom size="0.65 0.03 .99" pos="-0.65 0 0" type="box" friction="1 1 1" class="coll" name="wall_g0"/>
-        <geom size="0.65 0.03 .99" pos="1.55 0 0" type="box" friction="1 1 1" class="coll" name="wall_g1"/>
-        <geom size="1.0  0.03 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g2"/>
-        <geom size="1.0  0.03 .99" pos="2.2 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g3"/>
+        <geom size="0.65 0.01 .99" pos="-0.65 0 0" type="box" friction="1 1 1" class="coll" name="wall_g0"/>
+        <geom size="0.65 0.01 .99" pos="1.55 0 0" type="box" friction="1 1 1" class="coll" name="wall_g1"/>
+        <geom size="1.0  0.01 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g2"/>
+        <geom size="1.0  0.01 .99" pos="2.2 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g3"/>
         </body>
       </body>
       </body>
