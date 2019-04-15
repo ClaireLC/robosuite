@@ -24,24 +24,24 @@
       <body>
       <body name="collision">
         <body name="frame" pos="0 0 0" quat="1 0 0 0">
-            <inertial pos="0.45 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />
+            <inertial pos="0.6 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />
             <!--<inertial pos="0.29 0 0" quat="0.5 0.5 0.5 0.5" mass="7.85398" diaginertia="0.923301 0.764585 0.168533" />-->
-            <geom size="0.05 1." pos="0.9 0 0" type="cylinder" material="MatWood" rgba="1 0 0 1" class="viz" />
-            <geom size="0.05 1." pos="0.0 0 0" type="cylinder" material="MatWood" rgba="1 0 0 1" class="viz"/>
-            <geom size="0.05 1." pos="0.9 0 0" type="cylinder" rgba="1 0 0 1" class="coll" name="r_frame"/>
             <geom size="0.05 1." pos="0.0 0 0" type="cylinder" rgba="1 0 0 1" class="coll" name="l_frame"/>
-            <site name="door_center" pos="0.45 0.0 0.0" size="0.025" class="site" rgba="0 0 1 0"/>
-            <site name="goal" pos="0.45 0.5 0.0" size="0.1" class="site" rgba="0 1 0 0.3"/>
-            <body name="door" pos="0.45 0 0">
+            <geom size="0.05 1." pos="0.0 0 0" type="cylinder" material="MatWood" rgba="1 0 0 1" class="viz"/>
+            <geom size="0.05 1." pos="1.3 0 0" type="cylinder" rgba="1 0 0 1" class="coll" name="r_frame"/>
+            <geom size="0.05 1." pos="1.3 0 0" type="cylinder" material="MatWood" rgba="1 0 0 1" class="viz" />
+            <site name="door_center" pos="0.65 0.0 0.0" size="0.025" class="site" rgba="0 0 1 0"/>
+            <site name="goal"        pos="0.65 0.0 0.0" size="0.1" class="site" rgba="0 1 0 0.3"/>
+            <body name="door" pos="0.65 0 0">
                 <inertial pos="0.0296816 -0.00152345 0" quat="0.701072 0 0 0.713091" mass="0.1" diaginertia="0.0913751 0.0521615 0.043714" />
-                <joint name="door_hinge" pos="0.45 0 0" axis="0 0 1" range="0.0 4.7" damping="0.001" frictionloss=".001" limited="true"/>
-                <geom size="0.35 0.05 .99" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-                <geom size="0.05      .99" pos="0.35 0 0" type="cylinder" material="MatWood" class="viz" />
-                <geom size="0.05      .99" pos="-0.35 0 0" type="cylinder" material="MatWood" class="viz" />
-                <geom size="0.35 0.05 .99" type="box" friction="1 1 1" class="coll" name="door_box"/>
-                <geom size="0.05      .99" pos="0.35 0 0" type="cylinder"  class="coll" name="door_r_cyl"/>
-                <geom size="0.05      .99" pos="-0.35 0 0" type="cylinder"  class="coll" name="door_l_cyl" />
-                <body name="latch" pos="-0.25 0 -0.025">
+                <joint name="door_hinge" pos="0.65 0 0" axis="0 0 1" range="0.0 4.7" damping="0.001" frictionloss=".001" limited="true"/>
+                <geom size="0.55 0.05 .99" type="box" friction="1 1 1" class="coll" name="door_box"/>
+                <geom size="0.55 0.05 .99" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+                <geom size="0.05      .99" pos="0.55 0 0" type="cylinder"  class="coll" name="door_r_cyl"/>
+                <geom size="0.05      .99" pos="0.55 0 0" type="cylinder" material="MatWood" class="viz" />
+                <geom size="0.05      .99" pos="-0.55 0 0" type="cylinder"  class="coll" name="door_l_cyl" />
+                <geom size="0.05      .99" pos="-0.55 0 0" type="cylinder" material="MatWood" class="viz" />
+                <body name="latch" pos="-0.35 0 -0.025">
                     <inertial pos="-0.017762 0.0138544 0" quat="0.365653 0.605347 -0.36522 0.605365" mass="0.1" diaginertia="0.0483771 0.0410001 0.0111013" />
                     <geom size="0.05 0.15" quat="0.707388 0.706825 0 0" type="cylinder" material="MatFoil" class="viz" />
                     <geom size="0.02 0.1" pos="0 -0.15 -0.1" quat="1 0 0 0" type="capsule" material="MatFoil" class="viz"/>
@@ -50,15 +50,17 @@
                     <site name="door_handle" pos="0 -0.15 -0.1" size="0.025" class="site" rgba="1 0 0 1"/>
                 </body>
             </body>
-        <geom size="0.65 0.01 .99" pos="-0.65 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-        <geom size="0.65 0.01 .99" pos="1.55 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-        <geom size="1.0  0.01 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-        <geom size="1.0  0.01 .99" pos="2.2 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
-
         <geom size="0.65 0.01 .99" pos="-0.65 0 0" type="box" friction="1 1 1" class="coll" name="wall_g0"/>
-        <geom size="0.65 0.01 .99" pos="1.55 0 0" type="box" friction="1 1 1" class="coll" name="wall_g1"/>
+        <geom size="0.65 0.01 .99" pos="-0.65 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+
+        <geom size="0.65 0.01 .99" pos="1.95 0 0" type="box" friction="1 1 1" class="coll" name="wall_g1"/>
+        <geom size="0.65 0.01 .99" pos="1.95 0 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+
         <geom size="1.0  0.01 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g2"/>
-        <geom size="1.0  0.01 .99" pos="2.2 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g3"/>
+        <geom size="1.0  0.01 .99" pos="-1.3 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
+
+        <geom size="1.0  0.01 .99" pos="2.6 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" class="coll" name="wall_g3"/>
+        <geom size="1.0  0.01 .99" pos="2.6 -1.0 0" quat="0 0.707 0.707 0" type="box" friction="1 1 1" material="MatWood" class="viz"/>
         </body>
       </body>
       </body>
