@@ -3,7 +3,7 @@
 #all commands that start with SBATCH contain commands that are just used by SLURM for scheduling
 #################
 #partition name
-#SBATCH --partition=napoli-gpu
+#SBATCH --partition=napoli-cpu
 #################
 #number of GPUs
 ##SBATCH --gres=gpu:0
@@ -19,7 +19,7 @@
 #################
 #time you think you need; default is 2 hours
 #format could be dd-hh:mm:ss, hh:mm:ss, mm:ss, or mm
-#SBATCH --time=07:00:00
+#SBATCH --time=18:00:00
 #################
 # Quality of Service (QOS); think of it as sending your job into a special queue; --qos=long for with a max job length of 7 days.
 # uncomment ##SBATCH --qos=long if you want your job to run longer than 48 hours, which is the default for normal partition,  
@@ -50,8 +50,12 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 #now run normal batch commands
 # Begins in slurm_scripts
 BOT_MOTION="mmp"
-DOOR_TYPE="dpnl"
-
+DOOR_TYPE="dpnlr"
+EEF_TYPE="hook"
+DOOR_THETA=1.0
+ROBOT_THETA=0.0
+ROBOT_POS=(-0.5 -0.5 0)
+GOAL_OFFSET=(0.0 1.2)
 
 NSTEPS=8192
 HORIZON=4096
@@ -64,16 +68,18 @@ GAMMA=0.99
 LAM=0.95
 
 RCOEF_DIST_TO_HANDLE=0
-RCOEF_DOOR_ANGLE=0
+RCOEF_DOOR_ANGLE=1
 RCOEF_HANDLE_CON=0
 RCOEF_BODY_DOOR_CON=0
-RCOEF_SELF_CON=0
+RCOEF_SELF_CON=-1
 RCOEF_ARM_HANDLE_CON=0
 RCOEF_ARM_DOOR_CON=0
-RCOEF_FORCE=-500
+RCOEF_FORCE=-10
 RCOEF_GRIPPER_TOUCH=0
-RCOEF_DIST_TO_DOOR=1  
-RCOEF_WALL_CON=0
+RCOEF_DIST_TO_DOOR=4
+RCOEF_WALL_CON=-1
+
+RESET_ON_LARGE_FORCE="t"
 
 cd /sailhome/clairech/robosuite/robosuite/scripts
 
@@ -82,6 +88,7 @@ python learn_door.py \
   --job_id $SLURM_JOBID \
   --config_file ~/robosuite/robosuite/scripts/touching_door.json \
   --bot_motion $BOT_MOTION --door_type $DOOR_TYPE \
+  --eef_type $EEF_TYPE \
   --n_steps $NSTEPS --horizon $HORIZON \
   --opt_epochs $OPT_EPOCHS \
   --minibatches $MINIBATCHES \
@@ -98,14 +105,19 @@ python learn_door.py \
   --rcoef_arm_handle_con $RCOEF_ARM_HANDLE_CON \
   --rcoef_arm_door_con $RCOEF_ARM_DOOR_CON \
   --rcoef_force $RCOEF_FORCE \
+  --reset_on_large_force $RESET_ON_LARGE_FORCE \
   --rcoef_gripper_touch $RCOEF_GRIPPER_TOUCH \
   --rcoef_dist_to_door $RCOEF_DIST_TO_DOOR \
-  --rcoef_wall_con $RCOEF_WALL_CON
+  --rcoef_wall_con $RCOEF_WALL_CON \
+  --robot_theta $ROBOT_THETA \
+  --robot_pos ${ROBOT_POS[*]} \
+  --door_init_qpos $DOOR_THETA \
+  --goal_offset ${GOAL_OFFSET[*]}
 
 # train from checkpoint
-#DIR="/sailhome/clairech/robosuite/learned_models/close_593852_a.e_bm.mmp_cr.0.2_cf.20_dp.1.3.-0.05.1.0_dq.1.0.0.-1_dt.dpnl_ec.0.0_g.0.99_h.2048_l.0.95_m.4_nc.4_ns.4096_oe.10_radc.-2.0_rahc.-2.0_rbdc.-5.0_rdth.3.0_rda.80.0_rf.-100.0_rhc.4.0_rsc.-2.0_ra.ppo2_rp.0.0.0_vc.0.5"
+#DIR="/sailhome/clairech/robosuite/learned_models/simple_649763_cr.0.2_diq.2.0_dt.dpnlr_et.static_ec.0.0_g.0.99_go.0.0.1.5_h.4096_l.0.95_m.4_nc.4_ns.8192_oe.10_radc.0.0_rahc.0.0_rbdc.-1.0_rdtd.1.0_rdth.0.0_rda.0.0_rf.-10.0_rgt.0.0_rhc.0.0_rsc.0.0_rwc.-1.0_rolf.True_ra.ppo2_rp.-1.0.-0.5.0.0_rt.1.5_vc.0.5"
 #CF=$DIR"/args.json"
-#MODEL=$DIR"/5002000model.ckpt"
+#MODEL=$DIR"/10988000model.ckpt"
 #python learn_door.py --model $MODEL --config_file $CF
 
 
