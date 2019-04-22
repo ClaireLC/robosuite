@@ -50,11 +50,11 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 #now run normal batch commands
 # Begins in slurm_scripts
 BOT_MOTION="mmp"
-DOOR_TYPE="dpnlr"
-EEF_TYPE="hook"
-DOOR_THETA=1.0
-ROBOT_THETA=0.0
-ROBOT_POS=(-0.5 -0.5 0)
+DOOR_TYPE="dpnlrw"
+EEF_TYPE="static"
+DOOR_THETA=2.0
+ROBOT_THETA=1.5
+ROBOT_POS=(-1.0 -1.5 0)
 GOAL_OFFSET=(0.0 1.2)
 
 NSTEPS=8192
@@ -68,15 +68,15 @@ GAMMA=0.99
 LAM=0.95
 
 RCOEF_DIST_TO_HANDLE=0
-RCOEF_DOOR_ANGLE=1
+RCOEF_DOOR_ANGLE=0
 RCOEF_HANDLE_CON=0
-RCOEF_BODY_DOOR_CON=0
-RCOEF_SELF_CON=-1
+RCOEF_BODY_DOOR_CON=-1
+RCOEF_SELF_CON=0
 RCOEF_ARM_HANDLE_CON=0
 RCOEF_ARM_DOOR_CON=0
 RCOEF_FORCE=-10
 RCOEF_GRIPPER_TOUCH=0
-RCOEF_DIST_TO_DOOR=4
+RCOEF_DIST_TO_DOOR=1
 RCOEF_WALL_CON=-1
 
 RESET_ON_LARGE_FORCE="t"
@@ -86,7 +86,7 @@ cd /sailhome/clairech/robosuite/robosuite/scripts
 # train new learn_door.py
 python learn_door.py \
   --job_id $SLURM_JOBID \
-  --config_file ~/robosuite/robosuite/scripts/touching_door.json \
+  --config_file ~/robosuite/robosuite/scripts/default_door.json \
   --bot_motion $BOT_MOTION --door_type $DOOR_TYPE \
   --eef_type $EEF_TYPE \
   --n_steps $NSTEPS --horizon $HORIZON \
