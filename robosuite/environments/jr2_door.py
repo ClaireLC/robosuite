@@ -7,7 +7,7 @@ import robosuite.utils.transform_utils as T
 from robosuite.environments.baxter import BaxterEnv
 from robosuite.environments.jr2 import JR2Env
 
-from robosuite.models.objects import DoorPullNoLatchObject, DoorPullWithLatchObject, DoorPullNoLatchRoomObject
+from robosuite.models.objects import DoorPullNoLatchObject, DoorPullWithLatchObject, DoorPullNoLatchRoomObject, DoorPullNoLatchRoomWideObject
 from robosuite.models.arenas import TableArena, EmptyArena
 from robosuite.models.robots import Baxter
 from robosuite.models.tasks import DoorTask
@@ -79,6 +79,8 @@ class JR2Door(JR2Env):
          self.door = DoorPullWithLatchObject()
         elif (door_type == "dpnlr"):
          self.door = DoorPullNoLatchRoomObject()
+        elif (door_type == "dpnlrw"):
+         self.door = DoorPullNoLatchRoomWideObject()
 
         self.door_type = door_type
         self.mujoco_objects = OrderedDict([("Door", self.door)])
