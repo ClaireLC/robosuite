@@ -130,6 +130,8 @@
                             <inertial pos="0 0 0" mass="0" diaginertia="0 0 0" />
                         </body>
                         <body name="camera_link" pos="0.08 -0.09 0" quat="0.707388 0.706825 0 0">
+                            <camera mode="fixed" name="jr_cam" quat="0.5 0.5 -0.5 -0.5" fovy="80"/>
+                            <site name="cam" pos="0.0 0.0 0.0" size="0.05" rgba="1 1 0 1" type="sphere" class="site"/>
                             <inertial pos="0 0 0" quat="0 0.707107 0 0.707107" mass="0.1" diaginertia="0.002159 0.001789 0.001767" />
                             <geom size="0.0165 0.0875 0.015" type="box" rgba="0.2 0.2 0.2 1" class="viz"/>
                             <body name="camera_depth_frame" pos="0 0.06 0">
