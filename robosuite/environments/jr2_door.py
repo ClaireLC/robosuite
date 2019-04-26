@@ -97,8 +97,6 @@ class JR2Door(JR2Env):
         # whether to use ground-truth object states
         self.use_object_obs = use_object_obs
 
-        # reward configuration
-        self.reward_shaping = reward_shaping
         self.dist_to_handle_coef = dist_to_handle_coef
         self.door_angle_coef = door_angle_coef
         self.handle_con_coef = handle_con_coef
@@ -254,7 +252,7 @@ class JR2Door(JR2Env):
         rew_dist_to_door = self.dist_to_door_coef * (1 - np.tanh(base_to_door_dist))
 
         # Check contact with walls
-        if (self.door_type == "dpnlr"):
+        if (self.door_type == "dpnlr" or self.door_type == "dpnlrw"):
           wall_con = self.find_contacts(self.mujoco_robot.gripper_contact_geoms + self.mujoco_robot.arm_contact_geoms + self.mujoco_robot.body_contact_geoms, self.mujoco_objects["Door"].wall_contact_geoms)
           wall_con_num = len(list(wall_con)) > 0
           rew_wall_con = self.wall_con_coef * wall_con_num
