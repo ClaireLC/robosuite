@@ -217,7 +217,7 @@ class DoorPullNoLatchRoomObject(MujocoXMLObject):
 
 class DoorPullNoLatchRoomWideObject(MujocoXMLObject):
   """
-  Door: pull with latch with walls
+  Door: pull with no latch with walls
   """
 
   def __init__(self):
@@ -256,3 +256,17 @@ class DoorPullNoLatchRoomWideObject(MujocoXMLObject):
         "wall_g2",
         "wall_g3",
       ]
+
+class EmptyWithGoalObject(MujocoXMLObject):
+  """
+  Empty arena with goal site
+  """
+
+  def __init__(self):
+      super().__init__(xml_path_completion("objects/empty_with_goal.xml"))  
+
+  def set_goal_xpos(self, x_delta, y_delta):
+      """ Sets x,y position of goal site in door model with x and y offset from door center"""
+
+      goal_site = self.worldbody.find("./body/body/site[@name='goal']")
+      goal_site.set("pos", array_to_string([x_delta, y_delta, 0]))

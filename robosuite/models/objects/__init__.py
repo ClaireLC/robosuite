@@ -18,6 +18,7 @@ from .xml_objects import (
     DoorPullWithLatchObject,
     DoorPullNoLatchRoomObject,
     DoorPullNoLatchRoomWideObject,
+    EmptyWithGoalObject,
 )
 
 from .generated_objects import (

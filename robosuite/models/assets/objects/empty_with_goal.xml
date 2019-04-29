@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- from https://github.com/vikashplus/mj_envs/tree/master/mj_envs/hand_manipulation_suite/assets -->
+<!-- Information about door can be found in this paper: https://arxiv.org/pdf/1709.10087.pdf -->
+
+<mujoco model="goal">
+  <asset>
+    <texture file="../textures/wood.png" type="cube" name="wood" />
+    <texture file="../textures/foil.png" type="cube" name="foil" />
+    <material name="MatFoil" texture="foil" specular="1" shininess="0.3" rgba="0.9 0.9 0.9 1" />
+    <material name="MatWood" texture="wood" texrepeat="3 3" specular="0.4" shininess="0.1" />
+  </asset>
+  <default>
+    <default class="viz">
+      <geom contype="0" conaffinity="0" group="1" />
+    </default>
+    <default class="coll">
+      <geom group="0" />
+    </default>
+    <default class="site">
+      <geom group="2" />
+    </default>
+  </default>
+    <worldbody>
+      <body>
+      <body name="collision">
+        <site name="goal" pos="0.65 0.0 0.0" size="0.1" class="site" rgba="0 1 0 0.3"/>
+      </body>
+      </body>
+    </worldbody>
+</mujoco>
