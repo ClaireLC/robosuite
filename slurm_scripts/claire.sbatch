@@ -6,7 +6,7 @@
 #SBATCH --partition=napoli-cpu
 #################
 #number of GPUs
-##SBATCH --gres=gpu:0
+##SBATCH --gres=cpu:0
 #################
 #set a job name  
 #{{JOB_NAME}}
@@ -53,9 +53,9 @@ BOT_MOTION="mmp"
 DOOR_TYPE="dpnlrw"
 EEF_TYPE="static"
 DOOR_THETA=2.0
-ROBOT_THETA=1.5
-ROBOT_POS=(-1.0 -1.5 0)
-GOAL_OFFSET=(0.0 1.2)
+ROBOT_THETA=0.0
+ROBOT_POS=(0 1.0 0)
+GOAL_OFFSET=(2.5 0)
 
 NSTEPS=8192
 HORIZON=4096
@@ -84,7 +84,8 @@ RESET_ON_LARGE_FORCE="t"
 cd /sailhome/clairech/robosuite/robosuite/scripts
 
 # train new learn_door.py
-python learn_door.py \
+#python learn_door.py \
+python learn_nav.py \
   --job_id $SLURM_JOBID \
   --config_file ~/robosuite/robosuite/scripts/default_door.json \
   --bot_motion $BOT_MOTION --door_type $DOOR_TYPE \
@@ -115,9 +116,9 @@ python learn_door.py \
   --goal_offset ${GOAL_OFFSET[*]}
 
 # train from checkpoint
-#DIR="/sailhome/clairech/robosuite/learned_models/simple_649763_cr.0.2_diq.2.0_dt.dpnlr_et.static_ec.0.0_g.0.99_go.0.0.1.5_h.4096_l.0.95_m.4_nc.4_ns.8192_oe.10_radc.0.0_rahc.0.0_rbdc.-1.0_rdtd.1.0_rdth.0.0_rda.0.0_rf.-10.0_rgt.0.0_rhc.0.0_rsc.0.0_rwc.-1.0_rolf.True_ra.ppo2_rp.-1.0.-0.5.0.0_rt.1.5_vc.0.5"
+#DIR="/sailhome/clairech/robosuite/learned_models/wide_670099_cr.0.2_diq.2.0_dt.dpnlrw_et.static_ec.0.0_g.0.99_go.0.0.1.2_h.4096_l.0.95_m.4_nc.4_ns.8192_oe.10_radc.0.0_rahc.0.0_rbdc.-1.0_rdtd.1.0_rdth.0.0_rda.0.0_rf.-10.0_rgt.0.0_rhc.0.0_rsc.0.0_rwc.-1.0_rolf.True_ra.ppo2_rp.-1.0.-1.5.0.0_rt.1.5_vc.0.5"
 #CF=$DIR"/args.json"
-#MODEL=$DIR"/10988000model.ckpt"
+#MODEL=$DIR"/4985600model.ckpt"
 #python learn_door.py --model $MODEL --config_file $CF
 
 
