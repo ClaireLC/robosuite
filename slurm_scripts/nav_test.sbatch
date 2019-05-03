@@ -9,7 +9,7 @@
 ##SBATCH --gres=cpu:0
 #################
 #set a job name  
-{{JOB_NAME}}
+#{{JOB_NAME}}
 #################  
 #a file for job output, you can check job progress, append the job ID with %j to make it unique
 #SBATCH --output=/sailhome/clairech/robosuite/slurm_jobs/%j.out

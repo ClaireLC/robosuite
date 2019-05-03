@@ -42,7 +42,7 @@ def main():
   # Experiments CSV header
   with open("nav_experiments.csv", mode="a") as csv_id:
     writer = csv.writer(csv_id, delimiter=",", lineterminator="\n")
-    writer.writerow(["job_name, init_robot_pos, init_robot_theta, goal_pos"])
+    writer.writerow(["job_name", "robot_pos_x", "robot_pos_y", "init_robot_theta", "goal_pos_x", "goal_pos_y"])
 
   for ROBOT_THETA in np.linspace(0,6.0,4):
     for GOAL_OFFSET_X in np.linspace(2.5, 4.5, 3):
@@ -52,18 +52,18 @@ def main():
         DESCRIPTION          = job_name
 
         # Format goal offset string
-        GOAL_OFFSET = "[{},{}]".format(GOAL_OFFSET_X,GOAL_OFFSET_Y)
+        GOAL_OFFSET = "{} {}".format(GOAL_OFFSET_X,GOAL_OFFSET_Y)
         # Format robot pos string
-        ROBOT_POS = "[{},{},0.0]".format(ROBOT_POS_X,ROBOT_POS_Y)
+        ROBOT_POS = "{} {} 0.0".format(ROBOT_POS_X,ROBOT_POS_Y)
   
         # Write params to csv
         with open("nav_experiments.csv", mode="a") as csv_id:
           writer = csv.writer(csv_id, delimiter=",", lineterminator="\n")
-          writer.writerow([DESCRIPTION, ROBOT_POS, ROBOT_THETA, GOAL_OFFSET])
+          writer.writerow([DESCRIPTION, ROBOT_POS_X, ROBOT_POS_Y, ROBOT_THETA, GOAL_OFFSET_X, GOAL_OFFSET_Y])
   
         # Format sbatch command
         with open("nav_test.sbatch", "r") as sbatch_template:
-          filename = "nav_test_{}.sbatch".format(counter)
+          filename = "test_scripts/nav_test_{}.sbatch".format(counter)
           counter += 1
           with open(filename, "w") as templated_file:
             for line in sbatch_template:
@@ -73,6 +73,7 @@ def main():
                 exec_command = "python learn_nav.py \
 --job_id $SLURM_JOBID \
 --config_file {CONFIG_FILE} \
+--distance {DESCRIPTION} \
 --bot_motion {BOT_MOTION} --door_type {DOOR_TYPE} \
 --eef_type {EEF_TYPE} \
 --n_steps {NSTEPS} --horizon {HORIZON} \
@@ -88,10 +89,11 @@ def main():
 --reset_on_large_force {RESET_ON_LARGE_FORCE} \
 --rcoef_dist_to_door {RCOEF_DIST_TO_DOOR} \
 --robot_theta {ROBOT_THETA} \
---robot_pos [0, 0, 0] \
+--robot_pos 0 0 0 \
 --door_init_qpos {DOOR_THETA} \
 --goal_offset {GOAL_OFFSET}".format(\
                                 CONFIG_FILE = CONFIG_FILE,\
+                                DESCRIPTION = DESCRIPTION,\
                                 BOT_MOTION = BOT_MOTION,\
                                 DOOR_TYPE = DOOR_TYPE,\
                                 EEF_TYPE = EEF_TYPE,\
@@ -117,9 +119,8 @@ def main():
               else:
                 templated_file.write(line)
 
-            cmd = "sbatch " + filename
-            #os.system(cmd) 
-            #quit()
+          cmd = "sbatch " + filename
+          os.system(cmd) 
 
 if __name__ == '__main__':
   main()

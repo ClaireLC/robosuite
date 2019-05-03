@@ -46,7 +46,7 @@ def main():
   env = GymWrapper(
     suite.make(
     "JR2Nav",
-    has_renderer        = True,
+    has_renderer        = show_render,
     use_camera_obs      = False,
     ignore_done         = False,
     horizon             = args.horizon,
