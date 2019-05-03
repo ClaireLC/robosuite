@@ -157,6 +157,7 @@ class JR2Env(MujocoEnv):
       # If robot has gripper, action is a 9-dim vector
       # Copy the action to a list
       new_action = action.copy().tolist()
+      #print("Policy action {}".format(new_action))
       if self.debug_print:
         print("\nTimestep: {}".format(self.timestep))
         print("Robot pre_action info")
@@ -286,11 +287,11 @@ class JR2Env(MujocoEnv):
             di["base_pos"],
             di["base_theta"],
             di["base_vel"],
-            di["arm_joint_pos"],
-            di["arm_joint_vel"],
-            di["wheel_joint_vel"],
-            di["r_eef_xpos"],
-            di["r_eef_xquat"],
+            #di["arm_joint_pos"],
+            #di["arm_joint_vel"],
+            #di["wheel_joint_vel"],
+            #di["r_eef_xpos"],
+            #di["r_eef_xquat"],
         ]
     
         di["robot-state"] = np.concatenate(robot_states)
