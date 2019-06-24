@@ -11,7 +11,6 @@ from robosuite.environments.baxter_peg_in_hole import BaxterPegInHole
 
 from robosuite.environments.jr2_door import JR2Door
 from robosuite.environments.jr2_nav import JR2Nav
-from robosuite.environments.jr2_static_arm_door import JR2StaticArmDoor
 
 __version__ = "0.1.0"
 __logo__ = """
