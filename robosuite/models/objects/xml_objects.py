@@ -130,6 +130,14 @@ class DoorPullNoLatchObject(MujocoXMLObject):
         #super().__init__(xml_path_completion("objects/door_dapg.xml"))  
         super().__init__(xml_path_completion("objects/door_pull_no_latch.xml"))  
 
+  def set_goal_xpos(self, x_delta, y_delta):
+      """ Sets x,y position of goal site in door model with x and y offset from door center"""
+
+      door_center_site = self.worldbody.find("./body/body/body/site[@name='door_center']")
+      door_center_pos = string_to_array(door_center_site.get("pos"))
+      goal_site = self.worldbody.find("./body/body/body/site[@name='goal']")
+      goal_site.set("pos", array_to_string([door_center_pos[0] + x_delta, door_center_pos[1] + y_delta, -1.0]))
+
   @property
   def handle_contact_geoms(self):
       return[
@@ -155,6 +163,14 @@ class DoorPullWithLatchObject(MujocoXMLObject):
   def __init__(self):
         #super().__init__(xml_path_completion("objects/door_dapg.xml"))  
         super().__init__(xml_path_completion("objects/door_pull_with_latch.xml"))  
+
+  def set_goal_xpos(self, x_delta, y_delta):
+      """ Sets x,y position of goal site in door model with x and y offset from door center"""
+
+      door_center_site = self.worldbody.find("./body/body/body/site[@name='door_center']")
+      door_center_pos = string_to_array(door_center_site.get("pos"))
+      goal_site = self.worldbody.find("./body/body/body/site[@name='goal']")
+      goal_site.set("pos", array_to_string([door_center_pos[0] + x_delta, door_center_pos[1] + y_delta, -1.0]))
 
   @property
   def handle_contact_geoms(self):
