@@ -1,5 +1,5 @@
 """
-Driver class for Keyboard controller.
+Driver class for Keyboard controller for JR2.
 """
 
 import glfw
@@ -7,34 +7,53 @@ import numpy as np
 from robosuite.devices import Device
 from robosuite.utils.transform_utils import rotation_matrix
 
-
-class MyKeyboard(Device):
+class JRKeyboard(Device):
     """A Keyboard driver class to command JR2 with joint velocities."""
 
-    def __init__(self):
+    def __init__(self, eef_type):
         """
         Initialize a Keyboard device.
         """
-
+        # Set state dimensions according to eef type (dof)
+        if eef_type == "hook":
+          # 8 dof
+          self.state = {
+                        1: 0.0,
+                        2: 0.0,  
+                        3: 0.0,  
+                        4: 0.0,  
+                        5: 0.0,  
+                        6: 0.0,  
+                        7: 0.0,  
+                        8: 0.0,  
+                        }
+        elif eef_type == "static":
+          # 2 dof
+          self.state = {
+                        1: 0.0,
+                        2: 0.0,  
+                        }
+        elif eef_type == "gripper":
+          # 9 dof
+          self.state = {
+                        1: 0.0,
+                        2: 0.0,  
+                        3: 0.0,  
+                        4: 0.0,  
+                        5: 0.0,  
+                        6: 0.0,  
+                        7: 0.0,  
+                        8: 0.0,  
+                        9: 0.0,  
+                        }
+  
         self._display_controls()
         self._reset_internal_state()
 
         self._reset_state = 0
         self._enabled = False
-        self._vel_step = 0.1
+        self._vel_step = 0.1 # Step size for incrementing joint velocity
     
-        self.state = {
-                      1: 0.0,
-                      2: 0.0,  
-                      3: 0.0,  
-                      4: 0.0,  
-                      5: 0.0,  
-                      6: 0.0,  
-                      7: 0.0,  
-                      8: 0.0,  
-                      #9: 0.0,  
-                      }
-  
     def _display_controls(self):
         """
         Method to pretty print controls.
@@ -46,16 +65,10 @@ class MyKeyboard(Device):
 
         print("")
         print_command("Keys", "Command")
-        print_command("q", "reset simulation")
-        #print_command("spacebar", "toggle gripper (open/close)")
-        print_command("w-a-s-d", "move arm horizontally in x-y plane")
-        print_command("r", "set velocity to 0")
-        print_command("1-8", "joint to command")
-        #print_command("w-a-s-d", "move arm horizontally in x-y plane")
-        #print_command("r-f", "move arm vertically")
-        #print_command("z-x", "rotate arm about x-axis")
-        #print_command("t-g", "rotate arm about y-axis")
-        #print_command("c-v", "rotate arm about z-axis")
+        print_command("z", "Set all joint velocities to zero")
+        print_command("w-s", "Increment/decrement joint velocity command")
+        print_command("r", "Set velocity of current joint to 0")
+        print_command("1-{}".format(len(self.state)), "Number of joint to command")
         print_command("ESC", "quit")
         print("")
 
@@ -63,17 +76,8 @@ class MyKeyboard(Device):
         """
         Resets internal state of controller, except for the reset signal.
         """
-        self.state = {
-                      1: 0.0,
-                      2: 0.0,  
-                      3: 0.0,  
-                      4: 0.0,  
-                      5: 0.0,  
-                      6: 0.0,  
-                      7: 0.0,  
-                      8: 0.0,  
-                      #9: 0.0,  
-                      }
+        for joint_num in self.state:
+          self.state[joint_num] = 0.0
 
     def start_control(self):
         """
@@ -122,13 +126,8 @@ class MyKeyboard(Device):
         """
         Key handler for key releases.
         """
-
-        # controls for grasping
-        if key == glfw.KEY_SPACE:
-            self.grasp = not self.grasp  # toggle gripper
-
         # user-commanded reset
-        elif key == glfw.KEY_Q:
+        if key == glfw.KEY_Z:
             self._reset_state = 1
             self._enabled = False
             self._reset_internal_state()
